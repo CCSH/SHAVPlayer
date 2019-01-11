@@ -38,7 +38,7 @@
                                 </connections>
                             </button>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pFT-yy-UiE">
-                                <rect key="frame" x="20" y="555" width="335" height="2"/>
+                                <rect key="frame" x="20" y="555" width="335" height="3"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="2" id="PR5-Sc-SI7"/>
                                 </constraints>
@@ -49,7 +49,6 @@
                                     <constraint firstAttribute="height" constant="29" id="cE7-X8-Aej"/>
                                 </constraints>
                                 <connections>
-                                    <action selector="sliderChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="up3-ka-caB"/>
                                     <action selector="sliderEnd:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uQw-Is-BBV"/>
                                 </connections>
                             </slider>

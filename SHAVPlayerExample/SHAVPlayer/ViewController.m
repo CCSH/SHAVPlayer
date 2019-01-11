@@ -17,6 +17,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *timeLab;
 @property (weak, nonatomic) IBOutlet UISlider *slider;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
+@property (nonatomic, assign) BOOL isFullScreen;
 
 @end
 
@@ -28,84 +29,72 @@
     self.player = [[SHAVPlayer alloc]init];
     self.player.backgroundColor = [UIColor blackColor];
     self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
-    self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    self.player.videoUrl = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
+    self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+    
+    self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
+//    self.player.isBackPlay = YES;
+//    self.player.isAutomatic = YES;
     self.player.delegate = self;
+
     [self.player preparePlay];
+
+    
     [self.view addSubview:self.player];
     
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
-    
+    [[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
 }
 
 #pragma mark - SHAVPlayerDelegate
-#pragma mark 视频总时长(S)
-- (void)videoPlayWithTotalTime:(NSInteger)totalTime{
-    
-    //加载成功
+#pragma mark 资源总时长(S)
+- (void)shAVPlayWithTotalTime:(NSInteger)totalTime{
+
     self.slider.maximumValue = totalTime;
-    self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[self dealTime:self.slider.maximumValue]];
+    self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[self.player dealTime:self.slider.maximumValue]];
 }
 
-#pragma mark 视频当前时长(S)
-- (void)videoPlayWithCurrentTime:(NSInteger)currentTime{
+#pragma mark 资源当前时长(S)
+- (void)shAVPlayWithCurrentTime:(NSInteger)currentTime{
     
-    //开始播放了
-    self.timeLab.text = [NSString stringWithFormat:@"%@/%@",[self dealTime:currentTime],[self dealTime:self.slider.maximumValue]];
+    self.timeLab.text = [NSString stringWithFormat:@"%@/%@",[self.player dealTime:currentTime],[self.player dealTime:self.slider.maximumValue]];
     [self.slider setValue:currentTime animated:YES];
 }
 
-#pragma mark 视频缓存进度(S)
-- (void)videoPlayCacheProgressWithProgress:(CGFloat)progress{
-    [self.progress setProgress:progress animated:YES];
+#pragma mark 资源缓存时长(S)
+- (void)shAVPlayWithCacheTime:(NSInteger)cacheTime{
+    NSLog(@"当前缓冲时间 --- %ld S",(long)cacheTime);
+    [self.progress setProgress:(cacheTime / self.slider.maximumValue) animated:YES];
 }
 
-#pragma mark 视频播放错误
-- (void)videoPlayFailedWithError:(NSError *)error{
+#pragma mark 资源播放错误
+- (void)shAVPlayFailedWithError:(NSError *)error{
     NSLog(@"视频播放错误 --- %@",[error description]);
 }
 
-#pragma mark 视频播放完成
-- (void)videoPlayEnd{
+#pragma mark 资源播放完成
+- (void)shAVPlayEnd{
     NSLog(@"视频播放完成");
     [self.player stop];
 }
 
-#pragma mark 处理时间
-- (NSString *)dealTime:(CGFloat)time{
-    
-    if (isnan(time)) {
-        return @"00:00";
-    }
-    
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:time];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
-    
-    if (time/3600 >= 1) {
-        [formatter setDateFormat:@"HH:mm:ss"];
-    } else {
-        [formatter setDateFormat:@"mm:ss"];
-    }
-    return [formatter stringFromDate:date];
-}
-
-
 #pragma mark - action
-#pragma mark 滑块改变
-- (IBAction)sliderChange:(id)sender {
-    
-    if (self.slider.value == 0.000000) {
-        [self.player seekToTime:0];
-    }
-}
-
 #pragma mark 滑块离开
 - (IBAction)sliderEnd:(id)sender {
     NSLog(@"跳转到 --- %f",self.slider.value);
+    
     [self.player seekToTime:self.slider.value];
+    
+//    //如果资源不支持拖拽缓存，则去查看缓存进度是否达到跳转位置，未达到则不进行跳转
+//    NSInteger chace =  (NSInteger)(self.progress.progress*self.slider.maximumValue);
+//
+//    if (self.slider.value < chace - 5) {
+//        [self.player seekToTime:self.slider.value];
+//    }else{
+//        //监听缓存位置，再进行跳转
+//
+//    }
 }
 
+#pragma mark 按钮点击
 - (IBAction)btnAction:(UIButton *)sender {
     
     switch (sender.tag) {
@@ -122,10 +111,7 @@
         case 12:
         {
             AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
-            if (!self.player.isFullScreen) {
-//                CGRect frame = self.player.frame;
-//                frame.size.height = self.view.frame.size.height;
-//                self.player.frame = frame;
+            if (!self.isFullScreen) {
                 //支持旋转
                 app.isRotation = YES;
                 [self interfaceOrientation:UIInterfaceOrientationLandscapeRight];
@@ -136,7 +122,7 @@
                 [self interfaceOrientation:UIInterfaceOrientationPortrait];
             }
             
-            self.player.isFullScreen = !self.player.isFullScreen;
+            self.isFullScreen = !self.isFullScreen;
         }
             break;
         default:
