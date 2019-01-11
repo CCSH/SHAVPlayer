@@ -17,40 +17,47 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
-//视频总时长(S)
-- (void)videoPlayWithTotalTime:(NSInteger)totalTime;
-//视频当前时长(S)
-- (void)videoPlayWithCurrentTime:(NSInteger)currentTime;
+//资源总时长(S)
+- (void)shAVPlayWithTotalTime:(NSInteger)totalTime;
+//资源当前时长(S)
+- (void)shAVPlayWithCurrentTime:(NSInteger)currentTime;
+//资源缓存时长(S)
+- (void)shAVPlayWithCacheTime:(NSInteger)cacheTime;
 
-//视频缓存进度
-- (void)videoPlayCacheProgressWithProgress:(CGFloat)progress;
-//视频播放错误
-- (void)videoPlayFailedWithError:(NSError *)error;
-//视频播放完成
-- (void)videoPlayEnd;
+//资源播放错误
+- (void)shAVPlayFailedWithError:(NSError *)error;
+//资源播放完成
+- (void)shAVPlayEnd;
 
 @end
 
 @interface SHAVPlayer : UIView
 
-//视频url
-@property (nonatomic, copy) NSURL *videoUrl;
-//是否全屏
-@property (nonatomic, assign) BOOL isFullScreen;
+//资源url
+@property (nonatomic, copy) NSURL *url;
 //代理
 @property (nonatomic, weak) id<SHAVPlayerDelegate> delegate;
-
-//跳转多少秒
-- (void)seekToTime:(NSInteger)time;
+//是否自动播放
+@property (nonatomic, assign) BOOL isAutomatic;
+//是否后台播放音频(针对音频 需要设置app 后台模式 支持)
+@property (nonatomic, assign) BOOL isBackPlay;
 
 //准备播放
 - (void)preparePlay;
-//开始播放
+//开始播放(设置自动播放之后不用调用此方法)
 - (void)play;
 //暂停播放
 - (void)pause;
 //停止播放
 - (void)stop;
+
+//跳转多少秒
+- (void)seekToTime:(NSInteger)time;
+//处理时间
+- (NSString *)dealTime:(NSTimeInterval)time;
+
+//清除播放器
+- (void)cleanPlayer;
 
 @end
 
