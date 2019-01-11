@@ -12,4 +12,6 @@ pod 'SHAVPlayer'
 - [x] 音频后台播放
 - [x] 全屏播放(demo中有方法)
 - [x] 拖拽进度
+
+
 ![!image](https://github.com/CCSH/SHAVPlayer/blob/master/QQ20190111-103340-HD.gif)
