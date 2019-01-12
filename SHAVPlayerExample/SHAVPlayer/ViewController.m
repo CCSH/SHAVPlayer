@@ -29,7 +29,7 @@
     self.player = [[SHAVPlayer alloc]init];
     self.player.backgroundColor = [UIColor blackColor];
     self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
-    self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+    self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
 //    self.player.isBackPlay = YES;
@@ -38,7 +38,6 @@
 
     [self.player preparePlay];
 
-    
     [self.view addSubview:self.player];
     
     [[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
@@ -62,7 +61,7 @@
 #pragma mark 资源缓存时长(S)
 - (void)shAVPlayWithCacheTime:(NSInteger)cacheTime{
     NSLog(@"当前缓冲时间 --- %ld S",(long)cacheTime);
-    [self.progress setProgress:(cacheTime / self.slider.maximumValue) animated:YES];
+    self.progress.progress = (cacheTime / self.slider.maximumValue);
 }
 
 #pragma mark 资源播放错误
@@ -111,18 +110,26 @@
         case 12:
         {
             AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
-            if (!self.isFullScreen) {
+            self.isFullScreen = !self.isFullScreen;
+            
+            if (self.isFullScreen) {
                 //支持旋转
                 app.isRotation = YES;
                 [self interfaceOrientation:UIInterfaceOrientationLandscapeRight];
+                
+                [UIView animateWithDuration:0.25 animations:^{
+                    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+                }];
                 
             }else{
                 //不支持旋转
                 app.isRotation = NO;
                 [self interfaceOrientation:UIInterfaceOrientationPortrait];
+                
+                [UIView animateWithDuration:0.25 animations:^{
+                    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
+                }];
             }
-            
-            self.isFullScreen = !self.isFullScreen;
         }
             break;
         default:

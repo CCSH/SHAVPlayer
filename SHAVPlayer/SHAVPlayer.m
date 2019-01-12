@@ -137,7 +137,7 @@
 #pragma mark - 公共方法
 #pragma mark 准备播放
 - (void)preparePlay{
-    
+
     [self.playerLayer removeFromSuperlayer];
     
     //初始化
@@ -232,10 +232,8 @@
 - (void)cleanPlayer{
     
     [self pause];
-    
-    [self.playerItem removeObserver:self forKeyPath:@"status" context:nil];
-    [self.playerItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
 }
 
 @end
