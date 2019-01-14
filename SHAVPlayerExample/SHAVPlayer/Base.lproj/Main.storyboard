@@ -38,7 +38,7 @@
                                 </connections>
                             </button>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pFT-yy-UiE">
-                                <rect key="frame" x="20" y="555" width="335" height="3"/>
+                                <rect key="frame" x="20" y="555" width="335" height="2"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="2" id="PR5-Sc-SI7"/>
                                 </constraints>

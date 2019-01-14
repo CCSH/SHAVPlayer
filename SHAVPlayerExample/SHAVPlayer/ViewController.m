@@ -32,8 +32,8 @@
     self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
-//    self.player.isBackPlay = YES;
-//    self.player.isAutomatic = YES;
+    self.player.isBackPlay = YES;
+    self.player.isAutomatic = YES;
     self.player.delegate = self;
 
     [self.player preparePlay];
@@ -53,7 +53,7 @@
 
 #pragma mark 资源当前时长(S)
 - (void)shAVPlayWithCurrentTime:(NSInteger)currentTime{
-    
+
     self.timeLab.text = [NSString stringWithFormat:@"%@/%@",[self.player dealTime:currentTime],[self.player dealTime:self.slider.maximumValue]];
     [self.slider setValue:currentTime animated:YES];
 }
@@ -80,17 +80,9 @@
 - (IBAction)sliderEnd:(id)sender {
     NSLog(@"跳转到 --- %f",self.slider.value);
     
-    [self.player seekToTime:self.slider.value];
-    
-//    //如果资源不支持拖拽缓存，则去查看缓存进度是否达到跳转位置，未达到则不进行跳转
-//    NSInteger chace =  (NSInteger)(self.progress.progress*self.slider.maximumValue);
-//
-//    if (self.slider.value < chace - 5) {
-//        [self.player seekToTime:self.slider.value];
-//    }else{
-//        //监听缓存位置，再进行跳转
-//
-//    }
+    [self.player seekToTime:self.slider.value block:^(BOOL finish) {
+     
+    }];
 }
 
 #pragma mark 按钮点击

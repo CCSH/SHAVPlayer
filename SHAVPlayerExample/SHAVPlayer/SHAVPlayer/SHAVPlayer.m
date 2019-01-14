@@ -24,9 +24,22 @@
 
 @implementation SHAVPlayer
 
-- (void)dealloc {
-    //清除播放器
-    [self cleanPlayer];
+#pragma mark - 懒加载
+- (AVPlayer *)player{
+    if (!_player) {
+        _player = [[AVPlayer alloc] init];
+    }
+    return _player;
+}
+
+- (AVPlayerLayer *)playerLayer{
+    if (!_playerLayer) {
+        _playerLayer = [[AVPlayerLayer alloc]init];
+        _playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+        _playerLayer.frame = self.bounds;
+        [self.layer addSublayer:_playerLayer];
+    }
+    return _playerLayer;
 }
 
 #pragma mark - KVO
@@ -46,18 +59,18 @@
                 //转换成秒
                 NSInteger totalTime = CMTimeGetSeconds(duration);
                 
-                if (totalTime) {
+                if (totalTime > 0) {
                     //回调
                     if ([self.delegate respondsToSelector:@selector(shAVPlayWithTotalTime:)]) {
                         [self.delegate shAVPlayWithTotalTime:totalTime];
                     }
                 }
-                
+                //监听播放进度
+                [self addPeriodicTime];
+                //自动播放
                 if (self.isAutomatic) {
                     [self play];
                 }
-                //监听播放进度
-                [self addPeriodicTime];
             }
                 break;
             case AVPlayerItemStatusFailed:case AVPlayerItemStatusUnknown://播放错误、未知错误
@@ -84,8 +97,7 @@
         }
     }else if ([keyPath isEqualToString:@"frame"]){
         
-        CGRect frame = [change[NSKeyValueChangeNewKey] CGRectValue];
-        self.playerLayer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+        self.playerLayer.frame = self.bounds;
     }
 }
 
@@ -120,6 +132,16 @@
     }
 }
 
+#pragma mark 移除播放器
+- (void)removePlayerOnPlayerLayer {
+    self.playerLayer.player = nil;
+}
+
+#pragma mark 添加播放器
+- (void)resetPlayerToPlayerLayer {
+    self.playerLayer.player = self.player;
+}
+
 #pragma mark 获取缓存时间
 - (NSInteger)getCacheTime{
     
@@ -134,20 +156,8 @@
     return result;
 }
 
-#pragma mark - 公共方法
-#pragma mark 准备播放
-- (void)preparePlay{
-
-    [self.playerLayer removeFromSuperlayer];
-    
-    //初始化
-    self.playerItem = [AVPlayerItem playerItemWithURL:self.url];
-    self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
-    //创建播放器层
-    self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-    self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
-    self.playerLayer.frame = self.bounds;
-    [self.layer addSublayer:self.playerLayer];
+#pragma mark 添加监听
+- (void)addKVO{
     
     //监听status属性
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
@@ -155,17 +165,37 @@
     [self.playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
     //监听frame
     [self addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
+    
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     //播放完成通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playFinished) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
+    [center addObserver:self selector:@selector(playFinished) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
     
     if (self.isBackPlay) {//支持后台播放
+        [center addObserver:self selector:@selector(removePlayerOnPlayerLayer) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [center addObserver:self selector:@selector(resetPlayerToPlayerLayer) name:UIApplicationWillEnterForegroundNotification object:nil];
+        
         //不随着静音键和屏幕关闭而静音
         //设置锁屏仍能继续播放
-        [[AVAudioSession sharedInstance] setActive:YES error: nil];
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionAllowBluetooth error:nil];
         //让app支持接受远程控制事件
         [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     }
+}
+
+#pragma mark - 公共方法
+#pragma mark 准备播放
+- (void)preparePlay{
+    
+    //初始化
+    self.playerItem = [AVPlayerItem playerItemWithURL:self.url];
+    [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
+    self.playerLayer.player = self.player;
+    
+    //清除监听
+    [self cleanPlayer];
+    //添加监听
+    [self addKVO];
 }
 
 #pragma mark 开始播放
@@ -186,27 +216,18 @@
 
 #pragma mark 停止播放
 - (void)stop{
-    [self pause];
-    [self seekToTime:0];
+    
+    [self seekToTime:0 block:^(BOOL finish) {
+        [self pause];
+    }];
 }
 
 #pragma mark 跳转多少秒
-- (void)seekToTime:(NSInteger)time{
-    
-    CGFloat rate = self.player.rate;
+- (void)seekToTime:(NSInteger)time block:(void (^)(BOOL))block{
     
     CMTime changedTime = CMTimeMakeWithSeconds(time, 1);
     
-    __weak typeof(self) weakSelf = self;
-    [self.player seekToTime:changedTime completionHandler:^(BOOL finished) {
-        if (finished) {
-            if (rate == 1) {
-                [weakSelf.player play];
-            }else if (rate == 0){
-                [weakSelf.player pause];
-            }
-        }
-    }];
+    [self.player seekToTime:changedTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:block];
 }
 
 #pragma mark 处理时间
@@ -216,24 +237,24 @@
         return @"00:00";
     }
     
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:time];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
+    NSDateComponentsFormatter *formatter = [[NSDateComponentsFormatter alloc] init];
+    formatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
+    formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
     
     if (time/3600 >= 1) {
-        [formatter setDateFormat:@"HH:mm:ss"];
+        formatter.allowedUnits = kCFCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     } else {
-        [formatter setDateFormat:@"mm:ss"];
+        formatter.allowedUnits = NSCalendarUnitMinute | NSCalendarUnitSecond;
     }
-    return [formatter stringFromDate:date];
+    return [formatter stringFromTimeInterval:time];
 }
 
 #pragma mark 清除播放器
 - (void)cleanPlayer{
     
-    [self pause];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
+    [self pause];
 }
 
 @end

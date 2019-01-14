@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<SHAVPlayerDelegate> delegate;
 //是否自动播放
 @property (nonatomic, assign) BOOL isAutomatic;
-//是否后台播放音频(针对音频 需要设置app 后台模式 支持)
+//是否后台播放(需要设置app 后台模式 支持)
 @property (nonatomic, assign) BOOL isBackPlay;
 
 //准备播放
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stop;
 
 //跳转多少秒
-- (void)seekToTime:(NSInteger)time;
+- (void)seekToTime:(NSInteger)time block:(void (^)(BOOL finish))block;
 //处理时间
 - (NSString *)dealTime:(NSTimeInterval)time;
 
