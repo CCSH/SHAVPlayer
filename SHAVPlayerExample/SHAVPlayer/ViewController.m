@@ -26,6 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
     self.player = [[SHAVPlayer alloc]init];
     self.player.backgroundColor = [UIColor blackColor];
     self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
@@ -33,14 +34,22 @@
     
     self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
     self.player.isBackPlay = YES;
-    self.player.isAutomatic = YES;
+//    self.player.isAutomatic = YES;
     self.player.delegate = self;
 
-    [self.player preparePlay];
-
-    [self.view addSubview:self.player];
+    self.player.title = @"标题";
+    self.player.name = @"名字";
+    self.player.artist = @"歌手";
     
-    [[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+    [self.player preparePlay];
+    
+    UIView *view = [[UIView alloc]initWithFrame:self.player.frame];
+    self.player.frame = view.bounds;
+    [view addSubview:self.player];
+
+    [self.view addSubview:view];
+    
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
 }
 
 #pragma mark - SHAVPlayerDelegate
@@ -81,7 +90,7 @@
     NSLog(@"跳转到 --- %f",self.slider.value);
     
     [self.player seekToTime:self.slider.value block:^(BOOL finish) {
-     
+        
     }];
 }
 

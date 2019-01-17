@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 //资源播放完成
 - (void)shAVPlayEnd;
 
+//播放状态改变
+- (void)shAVPlayStatusChange:(BOOL)isPlay;
+
 @end
 
 @interface SHAVPlayer : UIView
@@ -42,6 +45,18 @@ NS_ASSUME_NONNULL_BEGIN
 //是否后台播放(需要设置app 后台模式 支持)
 @property (nonatomic, assign) BOOL isBackPlay;
 
+//锁屏音频信息(可以不设置)
+//标题
+@property (nonatomic, copy) NSString *title;
+//音乐名
+@property (nonatomic, copy) NSString *name;
+//作者
+@property (nonatomic, copy) NSString *artist;
+//封面图片
+@property (nonatomic, copy) UIImage *coverImage;
+//总时长(如果能获取到 内部有设置)
+@property (nonatomic, assign) NSInteger totalTime;
+
 //准备播放
 - (void)preparePlay;
 //开始播放(设置自动播放之后不用调用此方法)
@@ -52,12 +67,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stop;
 
 //跳转多少秒
-- (void)seekToTime:(NSInteger)time block:(void (^)(BOOL finish))block;
+- (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
 //处理时间
 - (NSString *)dealTime:(NSTimeInterval)time;
 
 //清除播放器
-- (void)cleanPlayer;
+- (void)removeKVO;
 
 @end
 
