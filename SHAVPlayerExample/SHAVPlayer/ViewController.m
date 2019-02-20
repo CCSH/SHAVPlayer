@@ -70,28 +70,47 @@
     self.progress.progress = (cacheTime / self.slider.maximumValue);
 }
 
-#pragma mark 资源播放错误
-- (void)shAVPlayFailedWithError:(NSError *)error{
-    NSLog(@"视频播放错误 --- %@",[error description]);
-}
-
-#pragma mark 资源播放完成
-- (void)shAVPlayEnd{
-    NSLog(@"视频播放完成");
-    if (self.isDrag) {//拖动中不设置
-        return;
-    }
-    [self.player stop];
-}
-
 #pragma mark 播放状态
-- (void)shAVPlayStatusChange:(BOOL)isPlay{
-    NSLog(@"播放状态 --- %@",isPlay?@"播放":@"暂停");
-}
-
-#pragma mark 加载状态
-- (void)shAVPlayLoading:(BOOL)isLoading{
-    NSLog(@"加载状态 --- %@",isLoading?@"加载中":@"可以播放");
+- (void)shAVPlayStatusChange:(SHAVPlayStatus)status{
+    switch (status) {
+        case SHAVPlayStatus_prepare://准备就绪
+        {
+            NSLog(@"播放状态 --- 准备就绪");
+        }
+            break;
+        case SHAVPlayStatus_play://播放
+        {
+            NSLog(@"播放状态 --- 播放");
+        }
+            break;
+        case SHAVPlayStatus_pause://暂停
+        {
+            NSLog(@"播放状态 --- 暂停");
+        }
+            break;
+        case SHAVPlayStatus_end://完成
+        {
+            NSLog(@"播放状态 --- 完成");
+            if (self.isDrag) {//拖动中不设置
+                return;
+            }
+            [self.player stop];
+        }
+            break;
+        case SHAVPlayStatus_loading://加载中
+        {
+            NSLog(@"播放状态 --- 加载中");
+        }
+            break;
+        case SHAVPlayStatus_failure://失败
+        {
+            NSLog(@"播放状态 --- 失败");
+        }
+            break;
+            
+        default:
+            break;
+    }
 }
 
 #pragma mark - action
