@@ -16,5 +16,6 @@ pod 'SHAVPlayer'
 - [x] ios 9.1 以上支持 锁屏拖拽进度播放
 - [x] 耳机控制
 - [x] 锁屏控制 播放、暂停、下一首、上一首等
+- [x] 加载中状态监听
 
 ![!image](https://github.com/CCSH/SHAVPlayer/blob/master/QQ20190111-103340-HD.gif)
