@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 //播放状态改变
 - (void)shAVPlayStatusChange:(BOOL)isPlay;
+//是否加载中
+- (void)shAVPlayLoading:(BOOL)isLoading;
 
 @end
 
@@ -59,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //准备播放
 - (void)preparePlay;
-//开始播放(设置自动播放之后不用调用此方法)
+//开始播放
 - (void)play;
 //暂停播放
 - (void)pause;
@@ -68,11 +70,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 //跳转多少秒
 - (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
-//处理时间
-- (NSString *)dealTime:(NSTimeInterval)time;
 
 //清除播放器
 - (void)removeKVO;
+
+//处理时间
++ (NSString *)dealTime:(NSTimeInterval)time;
+
 
 @end
 

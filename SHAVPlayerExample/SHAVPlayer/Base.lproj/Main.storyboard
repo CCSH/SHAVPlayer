@@ -53,6 +53,8 @@
                                     <constraint firstAttribute="height" constant="29" id="cE7-X8-Aej"/>
                                 </constraints>
                                 <connections>
+                                    <action selector="sliderChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="ZHd-s8-JYE"/>
+                                    <action selector="sliderDown:" destination="BYZ-38-t0r" eventType="touchDown" id="Xya-Rm-MxT"/>
                                     <action selector="sliderEnd:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uQw-Is-BBV"/>
                                 </connections>
                             </slider>

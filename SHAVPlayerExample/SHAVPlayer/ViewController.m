@@ -12,12 +12,16 @@
 
 @interface ViewController ()<SHAVPlayerDelegate>
 
-
 @property (nonatomic, strong) SHAVPlayer *player;
+
 @property (weak, nonatomic) IBOutlet UILabel *timeLab;
 @property (weak, nonatomic) IBOutlet UISlider *slider;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
+
+//是否全屏
 @property (nonatomic, assign) BOOL isFullScreen;
+//是否拖动中
+@property (nonatomic, assign) BOOL isDrag;
 
 @end
 
@@ -33,21 +37,11 @@
     self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
-    self.player.isBackPlay = YES;
-//    self.player.isAutomatic = YES;
     self.player.delegate = self;
-
-    self.player.title = @"标题";
-    self.player.name = @"名字";
-    self.player.artist = @"歌手";
     
     [self.player preparePlay];
-    
-    UIView *view = [[UIView alloc]initWithFrame:self.player.frame];
-    self.player.frame = view.bounds;
-    [view addSubview:self.player];
 
-    [self.view addSubview:view];
+    [self.view addSubview:self.player];
     
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
 }
@@ -57,14 +51,17 @@
 - (void)shAVPlayWithTotalTime:(NSInteger)totalTime{
 
     self.slider.maximumValue = totalTime;
-    self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[self.player dealTime:self.slider.maximumValue]];
+    self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[SHAVPlayer dealTime:self.slider.maximumValue]];
 }
 
 #pragma mark 资源当前时长(S)
 - (void)shAVPlayWithCurrentTime:(NSInteger)currentTime{
-
-    self.timeLab.text = [NSString stringWithFormat:@"%@/%@",[self.player dealTime:currentTime],[self.player dealTime:self.slider.maximumValue]];
+    
+    if (self.isDrag) {//拖动中不设置
+        return;
+    }
     [self.slider setValue:currentTime animated:YES];
+    [self sliderChanged:self.slider];
 }
 
 #pragma mark 资源缓存时长(S)
@@ -81,17 +78,39 @@
 #pragma mark 资源播放完成
 - (void)shAVPlayEnd{
     NSLog(@"视频播放完成");
+    if (self.isDrag) {//拖动中不设置
+        return;
+    }
     [self.player stop];
+}
+
+#pragma mark 播放状态
+- (void)shAVPlayStatusChange:(BOOL)isPlay{
+    NSLog(@"播放状态 --- %@",isPlay?@"播放":@"暂停");
+}
+
+#pragma mark 加载状态
+- (void)shAVPlayLoading:(BOOL)isLoading{
+    NSLog(@"加载状态 --- %@",isLoading?@"加载中":@"可以播放");
 }
 
 #pragma mark - action
 #pragma mark 滑块离开
 - (IBAction)sliderEnd:(id)sender {
-    NSLog(@"跳转到 --- %f",self.slider.value);
     
-    [self.player seekToTime:self.slider.value block:^(BOOL finish) {
-        
-    }];
+    self.isDrag = NO;
+    //离开进行跳转
+    [self.player seekToTime:self.slider.value block:nil];
+}
+#pragma mark 滑块按住
+- (IBAction)sliderDown:(id)sender {
+    self.isDrag = YES;
+}
+
+#pragma mark 改变
+- (IBAction)sliderChanged:(id)sender {
+    
+    self.timeLab.text = [NSString stringWithFormat:@"%@/%@",[SHAVPlayer dealTime:self.slider.value],[self.timeLab.text componentsSeparatedByString:@"/"].lastObject];
 }
 
 #pragma mark 按钮点击

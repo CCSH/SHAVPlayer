@@ -112,6 +112,16 @@
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
             [self.delegate shAVPlayStatusChange:(BOOL)self.player.rate];
         }
+    }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存为空
+
+        if ([self.delegate respondsToSelector:@selector(shAVPlayLoading:)]) {
+            [self.delegate shAVPlayLoading:YES];
+        }
+    }else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){//缓存可以用
+        
+        if ([self.delegate respondsToSelector:@selector(shAVPlayLoading:)]) {
+            [self.delegate shAVPlayLoading:NO];
+        }
     }
 }
 
@@ -198,6 +208,11 @@
     //监听播放状态
     [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
     
+    //监听播放的区域缓存是否为空
+    [self.playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
+    //缓存可以播放的时候调用
+    [self.playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
+    
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     //播放完成通知
     [center addObserver:self selector:@selector(playFinished) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
@@ -282,6 +297,7 @@
 #pragma mark 准备播放
 - (void)preparePlay{
     
+    [self stop];
     //初始化
     self.playerItem = [AVPlayerItem playerItemWithURL:self.url];
     [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
@@ -341,13 +357,25 @@
 #pragma mark 跳转多少秒
 - (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL))block{
     
+    //向下取整
+    time =  (int)time;
+    
+    //不能太大
+    if (time > self.totalTime) {
+        time = self.totalTime;
+    }
+    //不能太小
+    if (time < 0) {
+        time = 0;
+    }
+
     CMTime changedTime = CMTimeMakeWithSeconds(time, 1);
     
-    [self.player seekToTime:changedTime completionHandler:block];
+    [self.player seekToTime:changedTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:block];
 }
 
 #pragma mark 处理时间
-- (NSString *)dealTime:(NSTimeInterval)time{
++ (NSString *)dealTime:(NSTimeInterval)time{
     
     if (isnan(time)) {
         return @"00:00";
@@ -362,7 +390,13 @@
     } else {
         formatter.allowedUnits = NSCalendarUnitMinute | NSCalendarUnitSecond;
     }
-    return [formatter stringFromTimeInterval:time];
+    
+    NSString *dealTime = [formatter stringFromTimeInterval:time];
+    
+    if (dealTime.length == 7  || dealTime.length == 4) {
+        dealTime = [NSString stringWithFormat:@"0%@",dealTime];
+    }
+    return dealTime;
 }
 
 #pragma mark 清除播放器
@@ -373,9 +407,10 @@
         [self.player removeTimeObserver:self.timeObserver];
         self.timeObserver = nil;
     }
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self.player];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.player];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
     [rcc.playCommand removeTarget:self];
