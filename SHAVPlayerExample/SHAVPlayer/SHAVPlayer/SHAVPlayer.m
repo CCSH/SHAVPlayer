@@ -69,10 +69,8 @@
                 if (totalTime > 0) {
                     
                     self.totalTime = totalTime;
-                    //回调
-                    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-                        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_readyToPlay];
-                    }
+                    
+                    self.playStatus = SHAVPlayStatus_readyToPlay;
                 }
                 //监听播放进度
                 [self addPlayProgress];
@@ -82,11 +80,9 @@
                 }
             }
                 break;
-                case AVPlayerItemStatusFailed:case AVPlayerItemStatusUnknown://播放错误、未知错误
+            case AVPlayerItemStatusFailed:case AVPlayerItemStatusUnknown://播放错误、未知错误
             {
-                if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-                    [self.delegate shAVPlayStatusChange:SHAVPlayStatus_failure];
-                }
+                self.playStatus = SHAVPlayStatus_failure;
             }
                 break;
             default:
@@ -112,22 +108,18 @@
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
             
             if (self.player.rate == 1) {
-                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_play];
+                self.playStatus = SHAVPlayStatus_play;
             }else{
-                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_pause];
+                self.playStatus = SHAVPlayStatus_pause;
             }
             
         }
     }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存不可用
 
-        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_loading];
-        }
+        self.playStatus = SHAVPlayStatus_loading;
     }else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){//缓存可以用
         
-        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_canPlay];
-        }
+        self.playStatus = SHAVPlayStatus_canPlay;
     }
 }
 
@@ -297,6 +289,15 @@
             
             return MPRemoteCommandHandlerStatusSuccess;
         }];
+    }
+}
+
+- (void)setPlayStatus:(SHAVPlayStatus)playStatus{
+    _playStatus = playStatus;
+    
+    //回调
+    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+        [self.delegate shAVPlayStatusChange:playStatus];
     }
 }
 

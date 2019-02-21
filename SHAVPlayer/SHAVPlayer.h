@@ -57,8 +57,11 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *artist;
 //封面图片
 @property (nonatomic, copy) UIImage *coverImage;
+
 //总时长(如果能获取到 内部有设置)
 @property (nonatomic, assign) NSInteger totalTime;
+//播放器状态
+@property (nonatomic, assign) SHAVPlayStatus playStatus;
 
 //准备播放
 - (void)preparePlay;
