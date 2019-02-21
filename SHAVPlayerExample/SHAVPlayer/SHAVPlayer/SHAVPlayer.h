@@ -74,11 +74,10 @@ typedef enum : NSUInteger {
 - (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
 
 //清除播放器
-- (void)removeKVO;
+- (void)clearPlay;
 
 //处理时间
 + (NSString *)dealTime:(NSTimeInterval)time;
-
 
 @end
 

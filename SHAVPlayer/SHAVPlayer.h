@@ -10,6 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef enum : NSUInteger {
+    SHAVPlayStatus_prepare, //准备就绪
+    SHAVPlayStatus_play,    //播放
+    SHAVPlayStatus_pause,   //暂停
+    SHAVPlayStatus_end,     //完成
+    SHAVPlayStatus_loading, //加载中
+    SHAVPlayStatus_failure, //失败
+} SHAVPlayStatus;
+
 /**
  视频播放代理
  */
@@ -24,15 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 //资源缓存时长(S)
 - (void)shAVPlayWithCacheTime:(NSInteger)cacheTime;
 
-//资源播放错误
-- (void)shAVPlayFailedWithError:(NSError *)error;
-//资源播放完成
-- (void)shAVPlayEnd;
-
 //播放状态改变
-- (void)shAVPlayStatusChange:(BOOL)isPlay;
-//是否加载中
-- (void)shAVPlayLoading:(BOOL)isLoading;
+- (void)shAVPlayStatusChange:(SHAVPlayStatus)status;
 
 @end
 
@@ -72,11 +74,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
 
 //清除播放器
-- (void)removeKVO;
+- (void)clearPlay;
 
 //处理时间
 + (NSString *)dealTime:(NSTimeInterval)time;
-
 
 @end
 

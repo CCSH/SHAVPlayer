@@ -332,7 +332,7 @@
     }
     
     //清除监听
-    [self removeKVO];
+    [self clearPlay];
     //添加监听
     [self addKVO];
 }
@@ -406,7 +406,7 @@
 }
 
 #pragma mark 清除播放器
-- (void)removeKVO{
+- (void)clearPlay{
     [self pause];
     
     if (self.timeObserver) {

@@ -126,7 +126,7 @@
     self.isDrag = YES;
 }
 
-#pragma mark 改变
+#pragma mark 滑块改变
 - (IBAction)sliderChanged:(id)sender {
     
     self.timeLab.text = [NSString stringWithFormat:@"%@/%@",[SHAVPlayer dealTime:self.slider.value],[self.timeLab.text componentsSeparatedByString:@"/"].lastObject];

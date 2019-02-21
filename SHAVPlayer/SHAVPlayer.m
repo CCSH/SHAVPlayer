@@ -84,8 +84,8 @@
                 break;
                 case AVPlayerItemStatusFailed:case AVPlayerItemStatusUnknown://播放错误、未知错误
             {
-                if ([self.delegate respondsToSelector:@selector(shAVPlayFailedWithError:)]) {
-                    [self.delegate shAVPlayFailedWithError:playerItem.error];
+                if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+                    [self.delegate shAVPlayStatusChange:SHAVPlayStatus_failure];
                 }
             }
                 break;
@@ -110,17 +110,23 @@
     }else if ([keyPath isEqualToString:@"rate"]){//播放器状态
         
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-            [self.delegate shAVPlayStatusChange:(BOOL)self.player.rate];
+            
+            if (self.player.rate == 1) {
+                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_play];
+            }else{
+                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_pause];
+            }
+            
         }
     }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存为空
 
-        if ([self.delegate respondsToSelector:@selector(shAVPlayLoading:)]) {
-            [self.delegate shAVPlayLoading:YES];
+        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_loading];
         }
     }else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){//缓存可以用
         
-        if ([self.delegate respondsToSelector:@selector(shAVPlayLoading:)]) {
-            [self.delegate shAVPlayLoading:NO];
+        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_prepare];
         }
     }
 }
@@ -162,8 +168,8 @@
 #pragma mark 播放完成
 - (void)playFinished {
     //回调
-    if ([self.delegate respondsToSelector:@selector(shAVPlayEnd)]) {
-        [self.delegate shAVPlayEnd];
+    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_end];
     }
 }
 
@@ -326,7 +332,7 @@
     }
     
     //清除监听
-    [self removeKVO];
+    [self clearPlay];
     //添加监听
     [self addKVO];
 }
@@ -400,7 +406,7 @@
 }
 
 #pragma mark 清除播放器
-- (void)removeKVO{
+- (void)clearPlay{
     [self pause];
     
     if (self.timeObserver) {
