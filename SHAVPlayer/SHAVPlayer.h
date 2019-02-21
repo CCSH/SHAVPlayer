@@ -11,12 +11,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
-    SHAVPlayStatus_prepare, //准备就绪
-    SHAVPlayStatus_play,    //播放
-    SHAVPlayStatus_pause,   //暂停
-    SHAVPlayStatus_end,     //完成
-    SHAVPlayStatus_loading, //加载中
-    SHAVPlayStatus_failure, //失败
+    SHAVPlayStatus_readyToPlay,  //准备播放 (资源加载完成,可以使用)
+    SHAVPlayStatus_canPlay,     //可以播放 (缓存可用)
+    SHAVPlayStatus_loading,     //加载中   (缓存不可用)
+    SHAVPlayStatus_failure,     //失败
+    SHAVPlayStatus_play,        //播放
+    SHAVPlayStatus_pause,       //暂停
+    SHAVPlayStatus_end,         //完成
 } SHAVPlayStatus;
 
 /**
@@ -26,8 +27,6 @@ typedef enum : NSUInteger {
 
 @optional
 
-//资源总时长(S)
-- (void)shAVPlayWithTotalTime:(NSInteger)totalTime;
 //资源当前时长(S)
 - (void)shAVPlayWithCurrentTime:(NSInteger)currentTime;
 //资源缓存时长(S)

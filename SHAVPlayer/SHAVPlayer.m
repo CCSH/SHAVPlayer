@@ -70,8 +70,8 @@
                     
                     self.totalTime = totalTime;
                     //回调
-                    if ([self.delegate respondsToSelector:@selector(shAVPlayWithTotalTime:)]) {
-                        [self.delegate shAVPlayWithTotalTime:totalTime];
+                    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+                        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_readyToPlay];
                     }
                 }
                 //监听播放进度
@@ -118,7 +118,7 @@
             }
             
         }
-    }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存为空
+    }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存不可用
 
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
             [self.delegate shAVPlayStatusChange:SHAVPlayStatus_loading];
@@ -126,7 +126,7 @@
     }else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){//缓存可以用
         
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_prepare];
+            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_canPlay];
         }
     }
 }
@@ -205,19 +205,20 @@
 #pragma mark 添加监听
 - (void)addKVO{
     
+    //监听frame
+    [self addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
+    
     //监听status属性
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     //监听loadedTimeRanges属性
     [self.playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-    //监听frame
-    [self addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
-    //监听播放状态
-    [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
-    
     //监听播放的区域缓存是否为空
     [self.playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
     //缓存可以播放的时候调用
     [self.playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
+    
+    //监听播放状态
+    [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
     
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     //播放完成通知
@@ -303,7 +304,11 @@
 #pragma mark 准备播放
 - (void)preparePlay{
     
+    //清除监听
+    [self clearPlay];
+    //停止
     [self stop];
+    
     //初始化
     self.playerItem = [AVPlayerItem playerItemWithURL:self.url];
     [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
@@ -331,10 +336,10 @@
         }
     }
     
-    //清除监听
-    [self clearPlay];
-    //添加监听
-    [self addKVO];
+    if (self.url.absoluteString.length) {
+        //添加监听
+        [self addKVO];
+    }
 }
 
 #pragma mark 开始播放

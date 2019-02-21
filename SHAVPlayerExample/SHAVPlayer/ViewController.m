@@ -47,13 +47,6 @@
 }
 
 #pragma mark - SHAVPlayerDelegate
-#pragma mark 资源总时长(S)
-- (void)shAVPlayWithTotalTime:(NSInteger)totalTime{
-
-    self.slider.maximumValue = totalTime;
-    self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[SHAVPlayer dealTime:self.slider.maximumValue]];
-}
-
 #pragma mark 资源当前时长(S)
 - (void)shAVPlayWithCurrentTime:(NSInteger)currentTime{
     
@@ -73,9 +66,16 @@
 #pragma mark 播放状态
 - (void)shAVPlayStatusChange:(SHAVPlayStatus)status{
     switch (status) {
-        case SHAVPlayStatus_prepare://准备就绪
+        case SHAVPlayStatus_readyToPlay://准备播放
         {
-            NSLog(@"播放状态 --- 准备就绪");
+            NSLog(@"播放状态 --- 准备播放");
+            self.slider.maximumValue = self.player.totalTime;
+            self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[SHAVPlayer dealTime:self.player.totalTime]];
+        }
+            break;
+        case SHAVPlayStatus_canPlay://可以播放
+        {
+            NSLog(@"播放状态 --- 可以播放");
         }
             break;
         case SHAVPlayStatus_play://播放
@@ -107,7 +107,6 @@
             NSLog(@"播放状态 --- 失败");
         }
             break;
-            
         default:
             break;
     }
@@ -121,8 +120,9 @@
     //离开进行跳转
     [self.player seekToTime:self.slider.value block:nil];
 }
+
 #pragma mark 滑块按住
-- (IBAction)sliderDown:(id)sender {
+- (IBAction)sliderStart:(id)sender {
     self.isDrag = YES;
 }
 

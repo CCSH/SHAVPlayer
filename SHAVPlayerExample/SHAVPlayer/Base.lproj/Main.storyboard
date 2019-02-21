@@ -54,8 +54,9 @@
                                 </constraints>
                                 <connections>
                                     <action selector="sliderChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="ZHd-s8-JYE"/>
-                                    <action selector="sliderDown:" destination="BYZ-38-t0r" eventType="touchDown" id="Xya-Rm-MxT"/>
-                                    <action selector="sliderEnd:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uQw-Is-BBV"/>
+                                    <action selector="sliderEnd:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Rl1-pY-i6y"/>
+                                    <action selector="sliderEnd:" destination="BYZ-38-t0r" eventType="touchUpOutside" id="RqQ-7Y-dBD"/>
+                                    <action selector="sliderStart:" destination="BYZ-38-t0r" eventType="touchDown" id="k8Q-Cy-3c9"/>
                                 </connections>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00/00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cr0-8a-dzT">
