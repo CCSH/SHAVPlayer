@@ -23,6 +23,8 @@
 
 //播放监听
 @property (nonatomic, assign) id timeObserver;
+//时候有监听
+@property (nonatomic, assign) BOOL hasKVO;
 
 //锁屏信息
 @property (nonatomic, strong) NSMutableDictionary *lockInfo;
@@ -112,7 +114,6 @@
             }else{
                 self.playStatus = SHAVPlayStatus_pause;
             }
-            
         }
     }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存不可用
 
@@ -180,6 +181,17 @@
     self.playerLayer.player = self.player;
 }
 
+#pragma mark 状态回调
+- (void)setPlayStatus:(SHAVPlayStatus)playStatus{
+    _playStatus = playStatus;
+    
+    //回调
+    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
+        [self.delegate shAVPlayStatusChange:playStatus];
+    }
+}
+
+#pragma mark - 其他方法
 #pragma mark 获取缓存时间
 - (NSInteger)getCacheTime{
     
@@ -197,8 +209,12 @@
 #pragma mark 添加监听
 - (void)addKVO{
     
+    self.hasKVO = YES;
+    
     //监听frame
     [self addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
+    //监听播放状态
+    [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
     
     //监听status属性
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
@@ -209,15 +225,12 @@
     //缓存可以播放的时候调用
     [self.playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
     
-    //监听播放状态
-    [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
-    
+
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     //播放完成通知
     [center addObserver:self selector:@selector(playFinished) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
     //中断通知
     [center addObserver:self selector:@selector(handleInterreption) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
-    
     
     if (self.isBackPlay) {//支持后台播放
         
@@ -274,7 +287,6 @@
             // Fallback on earlier versions
         }
         
-        
         //上一首
         [rcc.previousTrackCommand setEnabled:YES];
         [rcc.previousTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
@@ -282,7 +294,6 @@
             return MPRemoteCommandHandlerStatusSuccess;
         }];
     
-        
         //下一首
         [rcc.nextTrackCommand setEnabled:YES];
         [rcc.nextTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
@@ -292,12 +303,27 @@
     }
 }
 
-- (void)setPlayStatus:(SHAVPlayStatus)playStatus{
-    _playStatus = playStatus;
+#pragma mark 清除监听
+- (void)clearKVO{
     
-    //回调
-    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:)]) {
-        [self.delegate shAVPlayStatusChange:playStatus];
+    if (self.hasKVO) {
+        self.hasKVO = NO;
+        
+        [self pause];
+        
+        if (self.timeObserver) {
+            [self.player removeTimeObserver:self.timeObserver];
+            self.timeObserver = nil;
+        }
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
+        [[NSNotificationCenter defaultCenter] removeObserver:self.player];
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        
+        MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
+        [rcc.playCommand removeTarget:self];
+        [rcc.pauseCommand removeTarget:self];
+        [rcc.togglePlayPauseCommand removeTarget:self];
     }
 }
 
@@ -306,9 +332,7 @@
 - (void)preparePlay{
     
     //清除监听
-    [self clearPlay];
-    //停止
-    [self stop];
+    [self clearKVO];
     
     //初始化
     self.playerItem = [AVPlayerItem playerItemWithURL:self.url];
@@ -381,8 +405,8 @@
         time = 0;
     }
 
+    //设置时间
     CMTime changedTime = CMTimeMakeWithSeconds(time, 1);
-    
     [self.player seekToTime:changedTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:block];
 }
 
@@ -408,26 +432,8 @@
     if (dealTime.length == 7  || dealTime.length == 4) {
         dealTime = [NSString stringWithFormat:@"0%@",dealTime];
     }
+    
     return dealTime;
-}
-
-#pragma mark 清除播放器
-- (void)clearPlay{
-    [self pause];
-    
-    if (self.timeObserver) {
-        [self.player removeTimeObserver:self.timeObserver];
-        self.timeObserver = nil;
-    }
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
-    [[NSNotificationCenter defaultCenter] removeObserver:self.player];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
-    [rcc.playCommand removeTarget:self];
-    [rcc.pauseCommand removeTarget:self];
-    [rcc.togglePlayPauseCommand removeTarget:self];
 }
 
 @end

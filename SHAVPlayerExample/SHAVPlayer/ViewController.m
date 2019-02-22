@@ -65,6 +65,7 @@
 
 #pragma mark 播放状态
 - (void)shAVPlayStatusChange:(SHAVPlayStatus)status{
+    
     switch (status) {
         case SHAVPlayStatus_readyToPlay://准备播放
         {

@@ -48,6 +48,11 @@ typedef enum : NSUInteger {
 //是否后台播放(需要设置app 后台模式 支持)
 @property (nonatomic, assign) BOOL isBackPlay;
 
+//总时长(如果能获取到 内部有设置)
+@property (nonatomic, assign) NSInteger totalTime;
+//播放器状态
+@property (nonatomic, assign) SHAVPlayStatus playStatus;
+
 //锁屏音频信息(可以不设置)
 //标题
 @property (nonatomic, copy) NSString *title;
@@ -57,11 +62,6 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *artist;
 //封面图片
 @property (nonatomic, copy) UIImage *coverImage;
-
-//总时长(如果能获取到 内部有设置)
-@property (nonatomic, assign) NSInteger totalTime;
-//播放器状态
-@property (nonatomic, assign) SHAVPlayStatus playStatus;
 
 //准备播放
 - (void)preparePlay;
@@ -75,8 +75,8 @@ typedef enum : NSUInteger {
 //跳转多少秒
 - (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
 
-//清除播放器
-- (void)clearPlay;
+//清除监听
+- (void)clearKVO;
 
 //处理时间
 + (NSString *)dealTime:(NSTimeInterval)time;
