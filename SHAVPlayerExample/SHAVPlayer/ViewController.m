@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) SHAVPlayer *player;
 
+@property (weak, nonatomic) IBOutlet UIButton *playBtn;
 @property (weak, nonatomic) IBOutlet UILabel *timeLab;
 @property (weak, nonatomic) IBOutlet UISlider *slider;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
@@ -33,11 +34,13 @@
     
     self.player = [[SHAVPlayer alloc]init];
     self.player.backgroundColor = [UIColor blackColor];
-    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
-    self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, self.timeLab.frame.origin.y);
+    self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
     self.player.delegate = self;
+    
+    self.player.savePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject stringByAppendingPathComponent:@"完整数据.mp4"];
     
     [self.player preparePlay];
 
@@ -64,7 +67,7 @@
 }
 
 #pragma mark 播放状态
-- (void)shAVPlayStatusChange:(SHAVPlayStatus)status{
+- (void)shAVPlayStatusChange:(SHAVPlayStatus)status message:(NSString *)message{
     
     switch (status) {
         case SHAVPlayStatus_readyToPlay://准备播放
@@ -82,11 +85,13 @@
         case SHAVPlayStatus_play://播放
         {
             NSLog(@"播放状态 --- 播放");
+            self.playBtn.selected = YES;
         }
             break;
         case SHAVPlayStatus_pause://暂停
         {
             NSLog(@"播放状态 --- 暂停");
+            self.playBtn.selected = NO;
         }
             break;
         case SHAVPlayStatus_end://完成
@@ -106,6 +111,11 @@
         case SHAVPlayStatus_failure://失败
         {
             NSLog(@"播放状态 --- 失败");
+        }
+            break;
+        case SHAVPlayStatus_downEnd://下载完成
+        {
+            NSLog(@"播放状态 --- 下载完成：%@",message);
         }
             break;
         default:
@@ -139,15 +149,14 @@
     switch (sender.tag) {
         case 10:
         {
-            [self.player play];
+            if (sender.selected) {
+                [self.player pause];
+            }else{
+                [self.player play];
+            }
         }
             break;
         case 11:
-        {
-            [self.player pause];
-        }
-            break;
-        case 12:
         {
             AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
             self.isFullScreen = !self.isFullScreen;
@@ -157,18 +166,18 @@
                 app.isRotation = YES;
                 [self interfaceOrientation:UIInterfaceOrientationLandscapeRight];
                 
-                [UIView animateWithDuration:0.25 animations:^{
-                    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-                }];
+//                [UIView animateWithDuration:0.25 animations:^{
+//                    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+//                }];
                 
             }else{
                 //不支持旋转
                 app.isRotation = NO;
                 [self interfaceOrientation:UIInterfaceOrientationPortrait];
                 
-                [UIView animateWithDuration:0.25 animations:^{
-                    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
-                }];
+//                [UIView animateWithDuration:0.25 animations:^{
+//                    self.player.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
+//                }];
             }
         }
             break;

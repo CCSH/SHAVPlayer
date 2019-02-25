@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C5F40122223BA8400FB0414 /* SHLoaderURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5F400E2223BA8300FB0414 /* SHLoaderURLConnection.m */; };
+		5C5F401B2223BDDD00FB0414 /* SHVideoRequestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5F401A2223BDDD00FB0414 /* SHVideoRequestTask.m */; };
 		5CC95C9F21DDF7B800C948E9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95C9E21DDF7B800C948E9 /* AppDelegate.m */; };
 		5CC95CA221DDF7B800C948E9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95CA121DDF7B800C948E9 /* ViewController.m */; };
 		5CC95CA521DDF7B800C948E9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5CC95CA321DDF7B800C948E9 /* Main.storyboard */; };
@@ -36,6 +38,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5C5F400E2223BA8300FB0414 /* SHLoaderURLConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHLoaderURLConnection.m; sourceTree = "<group>"; };
+		5C5F400F2223BA8400FB0414 /* SHLoaderURLConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHLoaderURLConnection.h; sourceTree = "<group>"; };
+		5C5F40192223BDDD00FB0414 /* SHVideoRequestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHVideoRequestTask.h; sourceTree = "<group>"; };
+		5C5F401A2223BDDD00FB0414 /* SHVideoRequestTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHVideoRequestTask.m; sourceTree = "<group>"; };
 		5CC95C9A21DDF7B800C948E9 /* SHAVPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SHAVPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CC95C9D21DDF7B800C948E9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5CC95C9E21DDF7B800C948E9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -139,6 +145,10 @@
 		5CC95CCF21DDF7D200C948E9 /* SHAVPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				5C5F400F2223BA8400FB0414 /* SHLoaderURLConnection.h */,
+				5C5F400E2223BA8300FB0414 /* SHLoaderURLConnection.m */,
+				5C5F40192223BDDD00FB0414 /* SHVideoRequestTask.h */,
+				5C5F401A2223BDDD00FB0414 /* SHVideoRequestTask.m */,
 				5CC95CD021DDF7FB00C948E9 /* SHAVPlayer.h */,
 				5CC95CD121DDF7FB00C948E9 /* SHAVPlayer.m */,
 			);
@@ -280,7 +290,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C5F401B2223BDDD00FB0414 /* SHVideoRequestTask.m in Sources */,
 				5CC95CA221DDF7B800C948E9 /* ViewController.m in Sources */,
+				5C5F40122223BA8400FB0414 /* SHLoaderURLConnection.m in Sources */,
 				5CC95CAD21DDF7B900C948E9 /* main.m in Sources */,
 				5CC95CD221DDF7FB00C948E9 /* SHAVPlayer.m in Sources */,
 				5CC95C9F21DDF7B800C948E9 /* AppDelegate.m in Sources */,

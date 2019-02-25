@@ -12,12 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
     SHAVPlayStatus_readyToPlay,  //准备播放 (资源加载完成,可以使用)
-    SHAVPlayStatus_canPlay,     //可以播放 (缓存可用)
-    SHAVPlayStatus_loading,     //加载中   (缓存不可用)
-    SHAVPlayStatus_failure,     //失败
-    SHAVPlayStatus_play,        //播放
-    SHAVPlayStatus_pause,       //暂停
-    SHAVPlayStatus_end,         //完成
+    SHAVPlayStatus_canPlay,      //可以播放 (缓存可用)
+    SHAVPlayStatus_loading,      //加载中   (缓存不可用)
+    SHAVPlayStatus_failure,      //失败
+    SHAVPlayStatus_play,         //播放
+    SHAVPlayStatus_pause,        //暂停
+    SHAVPlayStatus_end,          //播放完成
+    SHAVPlayStatus_downEnd,      //下载完成
 } SHAVPlayStatus;
 
 /**
@@ -33,7 +34,7 @@ typedef enum : NSUInteger {
 - (void)shAVPlayWithCacheTime:(NSInteger)cacheTime;
 
 //播放状态改变
-- (void)shAVPlayStatusChange:(SHAVPlayStatus)status;
+- (void)shAVPlayStatusChange:(SHAVPlayStatus)status message:(NSString *)message;
 
 @end
 
@@ -47,11 +48,11 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL isAutomatic;
 //是否后台播放(需要设置app 后台模式 支持)
 @property (nonatomic, assign) BOOL isBackPlay;
+//保存路径(如果设置则开启边下边播)
+@property (nonatomic, copy) NSString *savePath;
 
 //总时长(如果能获取到 内部有设置)
 @property (nonatomic, assign) NSInteger totalTime;
-//播放器状态
-@property (nonatomic, assign) SHAVPlayStatus playStatus;
 
 //锁屏音频信息(可以不设置)
 //标题
