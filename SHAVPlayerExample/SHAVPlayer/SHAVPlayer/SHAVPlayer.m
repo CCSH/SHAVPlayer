@@ -348,20 +348,13 @@
     
     //初始化
     AVURLAsset *asset;
-    if (self.savePath.length) {//路径有设置
-
-        if ([[NSFileManager defaultManager] fileExistsAtPath:self.savePath]) {//本地存在播放本地
-
-            asset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:self.savePath] options:nil];
-        }else{ //本地不存在开启边下边播
+    if (self.isDownLoad) {//是否开启边下边播
         
-            self.resouerLoader = [[SHLoaderURLConnection alloc] init];
-            self.resouerLoader.delegate = self;
-            
-            asset = [AVURLAsset URLAssetWithURL:[SHLoaderURLConnection getSchemeVideoURL:self.url] options:nil];
-            [asset.resourceLoader setDelegate:self.resouerLoader queue:dispatch_get_main_queue()];
-        }
-    
+        self.resouerLoader = [[SHLoaderURLConnection alloc] init];
+        self.resouerLoader.delegate = self;
+        
+        asset = [AVURLAsset URLAssetWithURL:[SHLoaderURLConnection getSchemeVideoURL:self.url] options:nil];
+        [asset.resourceLoader setDelegate:self.resouerLoader queue:dispatch_get_main_queue()];
     }else{//在线播放
         
         asset = [AVURLAsset URLAssetWithURL:self.url options:nil];
@@ -475,10 +468,6 @@
 #pragma mark - SHLoaderURLConnectionDelegate
 - (void)shLoaderDidFinishLoadingWithPath:(NSString *)path{
     
-    if (self.savePath.length) {
-        //保存缓存的数据到指定路径下
-        [[NSFileManager defaultManager] copyItemAtPath:path toPath:self.savePath error:nil];
-    }
     //回调
     if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
         

@@ -38,9 +38,9 @@
     self.player.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     self.player.url = [NSURL URLWithString:@"http://flv3.bn.netease.com/videolib3/1707/03/bGYNX4211/SD/bGYNX4211-mobile.mp4"];
-    self.player.delegate = self;
     
-    self.player.savePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject stringByAppendingPathComponent:@"完整数据.mp4"];
+    self.player.delegate = self;
+    self.player.isDownLoad = YES;
     
     [self.player preparePlay];
 
@@ -77,9 +77,16 @@
             self.timeLab.text = [NSString stringWithFormat:@"00:00/%@",[SHAVPlayer dealTime:self.player.totalTime]];
         }
             break;
+        case SHAVPlayStatus_loading://加载中
+        {
+            NSLog(@"播放状态 --- 加载中");
+            //加载中 出现
+        }
+            break;
         case SHAVPlayStatus_canPlay://可以播放
         {
             NSLog(@"播放状态 --- 可以播放");
+            //加载中 消失
         }
             break;
         case SHAVPlayStatus_play://播放
@@ -103,19 +110,16 @@
             [self.player stop];
         }
             break;
-        case SHAVPlayStatus_loading://加载中
-        {
-            NSLog(@"播放状态 --- 加载中");
-        }
-            break;
         case SHAVPlayStatus_failure://失败
         {
             NSLog(@"播放状态 --- 失败");
         }
             break;
-        case SHAVPlayStatus_downEnd://下载完成
+        case SHAVPlayStatus_downEnd://下载完成(没有格式的路径)
         {
-            NSLog(@"播放状态 --- 下载完成：%@",message);
+            NSLog(@"播放状态 --- 下载完成路径为：%@",message);
+            //可以在此处保存数据
+//            [[NSFileManager defaultManager] copyItemAtPath:message toPath:@"保存的路径.mp4" error:nil];
         }
             break;
         default:
@@ -128,8 +132,17 @@
 - (IBAction)sliderEnd:(id)sender {
     
     self.isDrag = NO;
+    
+    //拖拽进度 设置加载中 也可以不设置
+    [self shAVPlayStatusChange:SHAVPlayStatus_loading message:@""];
+    
     //离开进行跳转
-    [self.player seekToTime:self.slider.value block:nil];
+    __weak __typeof__(self) weakSelf = self;
+    [self.player seekToTime:self.slider.value block:^(BOOL finish) {
+        if (finish) {
+            [weakSelf shAVPlayStatusChange:SHAVPlayStatus_canPlay message:@""];
+        }
+    }];
 }
 
 #pragma mark 滑块按住

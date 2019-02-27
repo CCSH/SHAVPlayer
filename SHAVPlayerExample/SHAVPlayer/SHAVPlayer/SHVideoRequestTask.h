@@ -10,7 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 //缓存默认路径
-#define kSHTempPath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject stringByAppendingPathComponent:@"SHAVPlayer_temp.mp4"]
+#define kSHTempPath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject stringByAppendingPathComponent:@"SHAVPlayer_temp"]
 
 NS_ASSUME_NONNULL_BEGIN
 

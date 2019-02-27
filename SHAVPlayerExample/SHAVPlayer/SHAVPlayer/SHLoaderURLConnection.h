@@ -30,5 +30,4 @@
 //处理url
 + (NSURL *)getSchemeVideoURL:(NSURL *)url;
 
-
 @end

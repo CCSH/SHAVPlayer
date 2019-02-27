@@ -46,10 +46,11 @@ typedef enum : NSUInteger {
 @property (nonatomic, weak) id<SHAVPlayerDelegate> delegate;
 //是否自动播放
 @property (nonatomic, assign) BOOL isAutomatic;
+//是否开启边下边播
+@property (nonatomic, assign) BOOL isDownLoad;
 //是否后台播放(需要设置app 后台模式 支持)
 @property (nonatomic, assign) BOOL isBackPlay;
-//保存路径(如果设置则开启边下边播)
-@property (nonatomic, copy) NSString *savePath;
+
 
 //总时长(如果能获取到 内部有设置)
 @property (nonatomic, assign) NSInteger totalTime;

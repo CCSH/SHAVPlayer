@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5C5F40122223BA8400FB0414 /* SHLoaderURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5F400E2223BA8300FB0414 /* SHLoaderURLConnection.m */; };
 		5C5F401B2223BDDD00FB0414 /* SHVideoRequestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5F401A2223BDDD00FB0414 /* SHVideoRequestTask.m */; };
+		5C7385BF2225553000151F75 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95CA121DDF7B800C948E9 /* ViewController.m */; };
 		5CC95C9F21DDF7B800C948E9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95C9E21DDF7B800C948E9 /* AppDelegate.m */; };
 		5CC95CA221DDF7B800C948E9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95CA121DDF7B800C948E9 /* ViewController.m */; };
 		5CC95CA521DDF7B800C948E9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5CC95CA321DDF7B800C948E9 /* Main.storyboard */; };
@@ -303,6 +304,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C7385BF2225553000151F75 /* ViewController.m in Sources */,
 				5CC95CB721DDF7B900C948E9 /* SHAVPlayerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
