@@ -433,8 +433,8 @@
 #pragma mark 准备播放
 - (void)preparePlay{
     
-    //清除监听
-    [self clearKVO];
+    //清除信息
+    [self clearInfo];
     
     //初始化
     AVURLAsset *asset;
