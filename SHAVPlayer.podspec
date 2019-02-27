@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 s.name         = "SHAVPlayer"
-s.version      = "1.6.2"
-s.summary      = "音频、视频播放"
+s.version      = "1.6.3"
+s.summary      = "音频、视频播放 采用AVPlayer"
 s.license      = "MIT"
 s.authors      = { "CSH" => "624089195@qq.com" }
 s.platform     = :ios, "8.0"
