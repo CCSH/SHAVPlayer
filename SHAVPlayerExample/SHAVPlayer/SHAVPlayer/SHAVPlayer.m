@@ -72,7 +72,9 @@
                     
                     //回调
                     if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-                        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_readyToPlay message:[NSString stringWithFormat:@"%ld",(long)totalTime]];
+                        
+                        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_readyToPlay
+                                                    message:[NSString stringWithFormat:@"%ld",(long)totalTime]];
                     }
                 }
                 //监听播放进度
@@ -83,11 +85,14 @@
                 }
             }
                 break;
-            case AVPlayerItemStatusFailed:case AVPlayerItemStatusUnknown://播放错误、未知错误
+            case AVPlayerItemStatusFailed://播放错误
+            case AVPlayerItemStatusUnknown://未知错误
             {
                 //回调
                 if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-                    [self.delegate shAVPlayStatusChange:SHAVPlayStatus_failure message:[self.playerItem.error description]];
+                    
+                    [self.delegate shAVPlayStatusChange:SHAVPlayStatus_failure
+                                                message:[self.playerItem.error description]];
                 }
             }
                 break;
@@ -109,6 +114,7 @@
         
         //回调
         if ([self.delegate respondsToSelector:@selector(shAVPlayWithCacheTime:)]) {
+            
             [self.delegate shAVPlayWithCacheTime:cacheTime];
         }
     }else if ([keyPath isEqualToString:@"frame"]){//视图frame
@@ -120,9 +126,11 @@
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
             
             if (self.player.rate > 0 && !self.player.error) {
-                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_play message:@"播放"];
+                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_play
+                                            message:@"播放"];
             }else{
-                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_pause message:@"暂停"];
+                [self.delegate shAVPlayStatusChange:SHAVPlayStatus_pause
+                                            message:@"暂停"];
             }
         }
         
@@ -131,14 +139,16 @@
         //回调
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
             
-            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_loading message:@"缓存不可用"];
+            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_loading
+                                        message:@"缓存不可用"];
         }
     }else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){//缓存可以用
         
         //回调
         if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
             
-            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_canPlay message:@"缓存可以用"];
+            [self.delegate shAVPlayStatusChange:SHAVPlayStatus_canPlay
+                                        message:@"缓存可以用"];
         }
     }
 }
@@ -162,9 +172,11 @@
         if (weakSelf.isBackPlay) {//后台播放
             
             // 设置歌曲的总时长
-            [weakSelf.lockInfo setObject:@(weakSelf.totalTime) forKey:MPMediaItemPropertyPlaybackDuration];
+            [weakSelf.lockInfo setObject:@(weakSelf.totalTime)
+                                  forKey:MPMediaItemPropertyPlaybackDuration];
             // 设置当前时间
-            [weakSelf.lockInfo setObject:@(currentTime) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+            [weakSelf.lockInfo setObject:@(currentTime)
+                                  forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
             
             // 音乐信息赋值给获取锁屏中心的nowPlayingInfo属性
             [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:weakSelf.lockInfo];
@@ -172,6 +184,7 @@
         
         //回调
         if ([weakSelf.delegate respondsToSelector:@selector(shAVPlayWithCurrentTime:)]) {
+            
             [weakSelf.delegate shAVPlayWithCurrentTime:currentTime];
         }
     }];
@@ -183,7 +196,8 @@
     //回调
     if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
         
-        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_end message:@"播放完成"];
+        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_end
+                                    message:@"播放完成"];
     }
 }
 
@@ -206,103 +220,85 @@
 }
 
 #pragma mark - 其他方法
-#pragma mark 添加监听
-- (void)addKVO{
+#pragma mark 配置信息
+- (void)configInfo{
     
     self.hasKVO = YES;
     
     //监听frame
-    [self addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self
+           forKeyPath:@"frame"
+              options:NSKeyValueObservingOptionNew
+              context:nil];
     //监听播放状态
-    [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
+    [self.player addObserver:self
+                  forKeyPath:@"rate"
+                     options:NSKeyValueObservingOptionNew
+                     context:nil];
     
     //监听status属性
-    [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.playerItem addObserver:self
+                      forKeyPath:@"status"
+                         options:NSKeyValueObservingOptionNew
+                         context:nil];
     //监听loadedTimeRanges属性
-    [self.playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
+    [self.playerItem addObserver:self
+                      forKeyPath:@"loadedTimeRanges"
+                         options:NSKeyValueObservingOptionNew
+                         context:nil];
     //监听播放的区域缓存是否为空
-    [self.playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
+    [self.playerItem addObserver:self
+                      forKeyPath:@"playbackBufferEmpty"
+                         options:NSKeyValueObservingOptionNew
+                         context:nil];
     //缓存可以播放的时候调用
-    [self.playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
+    [self.playerItem addObserver:self
+                      forKeyPath:@"playbackLikelyToKeepUp"
+                         options:NSKeyValueObservingOptionNew
+                         context:nil];
     
     //播放完成通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playFinished) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playFinished)
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:self.playerItem];
     //中断通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterreption) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleInterreption)
+                                                 name:AVAudioSessionInterruptionNotification
+                                               object:[AVAudioSession sharedInstance]];
+    
+    [[AVAudioSession sharedInstance] setActive:YES
+                                         error:nil];
     
     if (self.isBackPlay) {//支持后台播放
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removePlayerOnPlayerLayer) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetPlayerToPlayerLayer) name:UIApplicationWillEnterForegroundNotification object:nil];
-        
-        //不随着静音键和屏幕关闭而静音
-        //设置锁屏仍能继续播放
-        [[AVAudioSession sharedInstance] setActive:YES error:nil];
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionAllowBluetooth error:nil];
-        
-        //接收远程控制
-        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-        
-        //设置控制方法
-        MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
-        
-        //界面控制
-        [rcc.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            [self play];
-            return MPRemoteCommandHandlerStatusSuccess;
-        }];
-        
-        [rcc.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            [self pause];
-            return MPRemoteCommandHandlerStatusSuccess;
-        }];
-        
-        //播放与暂停(耳机线控)
-        [rcc.togglePlayPauseCommand setEnabled:YES];
-        [rcc.togglePlayPauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            if (self.player.rate) {
-                [self pause];
-            }else{
-                [self play];
-            }
-            return MPRemoteCommandHandlerStatusSuccess;
-        }];
-        
-        //拖拽进度
-        if (@available(iOS 9.1, *)) {
-            
-            [rcc.changePlaybackPositionCommand setEnabled:YES];
-            [rcc.changePlaybackPositionCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-                
-                //跳转时间
-                MPChangePlaybackPositionCommandEvent *playEvent = (MPChangePlaybackPositionCommandEvent *)event;
-                //进行跳转
-                [self seekToTime:playEvent.positionTime block:nil];
-                
-                return MPRemoteCommandHandlerStatusSuccess;
-            }];
-        } else {
-            // Fallback on earlier versions
-        }
-        
-        //上一首
-        [rcc.previousTrackCommand setEnabled:YES];
-        [rcc.previousTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            
-            return MPRemoteCommandHandlerStatusSuccess;
-        }];
-        
-        //下一首
-        [rcc.nextTrackCommand setEnabled:YES];
-        [rcc.nextTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            
-            return MPRemoteCommandHandlerStatusSuccess;
-        }];
+        //设置锁屏播放
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+                                         withOptions:AVAudioSessionCategoryOptionAllowBluetooth
+                                               error:nil];
+        //添加通知
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(removePlayerOnPlayerLayer)
+                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(resetPlayerToPlayerLayer)
+                                                     name:UIApplicationWillEnterForegroundNotification
+                                                   object:nil];
+    
+        //设置锁屏信息
+        [self configLockInfo];
+    }else{
+        //设置锁屏不能播放
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategorySoloAmbient
+                                         withOptions:AVAudioSessionCategoryOptionAllowBluetooth
+                                               error:nil];
     }
 }
 
-#pragma mark 清除监听
-- (void)clearKVO{
+#pragma mark 清除信息
+- (void)clearInfo{
     
     if (self.hasKVO) {
         
@@ -319,24 +315,118 @@
         
         if (self.playerItem) {
             
-            [self.playerItem removeObserver:self forKeyPath:@"status"];
-            [self.playerItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
-            [self.playerItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
-            [self.playerItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
+            [self.playerItem removeObserver:self
+                                 forKeyPath:@"status"];
+            [self.playerItem removeObserver:self
+                                 forKeyPath:@"loadedTimeRanges"];
+            [self.playerItem removeObserver:self
+                                 forKeyPath:@"playbackBufferEmpty"];
+            [self.playerItem removeObserver:self
+                                 forKeyPath:@"playbackLikelyToKeepUp"];
         }
         
-        [self removeObserver:self forKeyPath:@"frame"];
-        [self.player removeObserver:self forKeyPath:@"rate"];
+        [self removeObserver:self
+                  forKeyPath:@"frame"];
+        [self.player removeObserver:self
+                         forKeyPath:@"rate"];
         
         [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
         [[NSNotificationCenter defaultCenter] removeObserver:[AVAudioSession sharedInstance]];
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         
+        //移除锁屏控制
+        [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+        
         MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
         [rcc.playCommand removeTarget:self];
         [rcc.pauseCommand removeTarget:self];
         [rcc.togglePlayPauseCommand removeTarget:self];
+        
+        [[AVAudioSession sharedInstance] setActive:NO
+                                             error:nil];
     }
+}
+
+#pragma mark 设置锁屏信息
+- (void)configLockInfo{
+    
+    //锁屏信息
+    self.lockInfo = [NSMutableDictionary dictionary];
+    // 1、设置标题
+    if (self.title) {
+        [self.lockInfo setObject:self.title forKey:MPMediaItemPropertyTitle];
+    }
+    // 2、设置歌曲名
+    if (self.name) {
+        [self.lockInfo setObject:self.name forKey:MPMediaItemPropertyAlbumTitle];
+    }
+    // 3、设置艺术家
+    if (self.artist) {
+        [self.lockInfo setObject:self.artist forKey:MPMediaItemPropertyArtist];
+    }
+    // 4、设置封面的图片
+    if (self.coverImage) {
+        MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithImage:self.coverImage];
+        [self.lockInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+    }
+    
+    //接收远程控制
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    
+    MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
+    
+    //界面控制
+    [rcc.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+        [self play];
+        return MPRemoteCommandHandlerStatusSuccess;
+    }];
+    
+    [rcc.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+        [self pause];
+        return MPRemoteCommandHandlerStatusSuccess;
+    }];
+    
+    //播放与暂停(耳机线控)
+    [rcc.togglePlayPauseCommand setEnabled:YES];
+    [rcc.togglePlayPauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+        if (self.player.rate) {
+            [self pause];
+        }else{
+            [self play];
+        }
+        return MPRemoteCommandHandlerStatusSuccess;
+    }];
+    
+    //拖拽进度
+    if (@available(iOS 9.1, *)) {
+        
+        [rcc.changePlaybackPositionCommand setEnabled:YES];
+        [rcc.changePlaybackPositionCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+            
+            //跳转时间
+            MPChangePlaybackPositionCommandEvent *playEvent = (MPChangePlaybackPositionCommandEvent *)event;
+            //进行跳转
+            [self seekToTime:playEvent.positionTime block:nil];
+            
+            return MPRemoteCommandHandlerStatusSuccess;
+        }];
+    } else {
+        // Fallback on earlier versions
+    }
+    
+    //上一首
+    [rcc.previousTrackCommand setEnabled:YES];
+    [rcc.previousTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+        
+        return MPRemoteCommandHandlerStatusSuccess;
+    }];
+    
+    //下一首
+    [rcc.nextTrackCommand setEnabled:YES];
+    [rcc.nextTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+        
+        return MPRemoteCommandHandlerStatusSuccess;
+    }];
 }
 
 #pragma mark - 公共方法
@@ -374,30 +464,8 @@
         return;
     }
     
-    if (self.isBackPlay) {//后台播放
-        //锁屏信息
-        self.lockInfo = [NSMutableDictionary dictionary];
-        // 1、设置标题
-        if (self.title) {
-            [self.lockInfo setObject:self.title forKey:MPMediaItemPropertyTitle];
-        }
-        // 2、设置歌曲名
-        if (self.name) {
-            [self.lockInfo setObject:self.name forKey:MPMediaItemPropertyAlbumTitle];
-        }
-        // 3、设置艺术家
-        if (self.artist) {
-            [self.lockInfo setObject:self.artist forKey:MPMediaItemPropertyArtist];
-        }
-        // 4、设置封面的图片
-        if (self.coverImage) {
-            MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithImage:self.coverImage];
-            [self.lockInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
-        }
-    }
-    
-    //添加监听
-    [self addKVO];
+    //配置信息
+    [self configInfo];
 }
 
 #pragma mark 开始播放

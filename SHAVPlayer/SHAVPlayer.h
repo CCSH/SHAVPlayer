@@ -48,9 +48,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL isAutomatic;
 //是否开启边下边播
 @property (nonatomic, assign) BOOL isDownLoad;
-//是否后台播放(需要设置app 后台模式 支持)
+//是否后台播放(需要设置app 后台模式 background modes 支持)
 @property (nonatomic, assign) BOOL isBackPlay;
-
 
 //总时长(如果能获取到 内部有设置)
 @property (nonatomic, assign) NSInteger totalTime;
@@ -77,8 +76,8 @@ typedef enum : NSUInteger {
 //跳转多少秒
 - (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
 
-//清除监听
-- (void)clearKVO;
+//清除信息
+- (void)clearInfo;
 
 //处理时间
 + (NSString *)dealTime:(NSTimeInterval)time;

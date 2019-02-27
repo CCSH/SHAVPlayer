@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = "SHAVPlayer"
-s.version      = "1.6.1"
+s.version      = "1.6.2"
 s.summary      = "音频、视频播放"
 s.license      = "MIT"
 s.authors      = { "CSH" => "624089195@qq.com" }
