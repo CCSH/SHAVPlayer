@@ -22,4 +22,4 @@ pod 'SHAVPlayer'
 
 ![!image](https://github.com/CCSH/SHAVPlayer/blob/master/QQ20190111-103340-HD.gif)
 
-注：边下边播参考(https://github.com/suifengqjn/TBPlayer)
+注：[边下边播参考](https://github.com/suifengqjn/TBPlayer)
