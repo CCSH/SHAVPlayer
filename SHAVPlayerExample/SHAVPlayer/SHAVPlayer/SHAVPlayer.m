@@ -207,16 +207,23 @@
     [self pause];
 }
 
-#pragma mark 移除播放器
-- (void)removePlayerOnPlayerLayer {
+#pragma mark 进入后台
+- (void)enterBackground{
     
-    self.playerLayer.player = nil;
+    if (self.isBackPlay) {
+        self.playerLayer.player = nil;
+    }else{
+        [self pause];
+    }
 }
 
-#pragma mark 添加播放器
-- (void)resetPlayerToPlayerLayer {
+#pragma mark 进入前台
+- (void)enterForeground{
     
-    self.playerLayer.player = self.player;
+    if (self.isBackPlay && !self.playerLayer.player) {
+        
+        self.playerLayer.player = self.player;
+    }
 }
 
 #pragma mark - 其他方法
@@ -267,40 +274,35 @@
                                              selector:@selector(handleInterreption)
                                                  name:AVAudioSessionInterruptionNotification
                                                object:[AVAudioSession sharedInstance]];
+    //进入后台通知
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(enterBackground)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+    //进入前台通知
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(enterForeground)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
     
+    //设置锁屏播放
     [[AVAudioSession sharedInstance] setActive:YES
                                          error:nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+                                     withOptions:AVAudioSessionCategoryOptionAllowBluetooth
+                                           error:nil];
     
     if (self.isBackPlay) {//支持后台播放
         
-        //设置锁屏播放
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
-                                         withOptions:AVAudioSessionCategoryOptionAllowBluetooth
-                                               error:nil];
-        //添加通知
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(removePlayerOnPlayerLayer)
-                                                     name:UIApplicationDidEnterBackgroundNotification
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(resetPlayerToPlayerLayer)
-                                                     name:UIApplicationWillEnterForegroundNotification
-                                                   object:nil];
-    
         //设置锁屏信息
         [self configLockInfo];
-    }else{
-        //设置锁屏不能播放
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategorySoloAmbient
-                                         withOptions:AVAudioSessionCategoryOptionAllowBluetooth
-                                               error:nil];
     }
 }
 
 #pragma mark 清除信息
 - (void)clearInfo{
     
-    if (self.hasKVO) {
+    if (self.hasKVO) {//避免多次移除报错
         
         self.hasKVO = NO;
         
@@ -330,9 +332,9 @@
         [self.player removeObserver:self
                          forKeyPath:@"rate"];
         
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
         [[NSNotificationCenter defaultCenter] removeObserver:self.playerItem];
         [[NSNotificationCenter defaultCenter] removeObserver:[AVAudioSession sharedInstance]];
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
         
         //移除锁屏控制
         [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
