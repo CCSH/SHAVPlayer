@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -69,6 +67,10 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yWS-65-Odz" customClass="SHAVPlayer">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="506"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -78,6 +80,7 @@
                             <constraint firstItem="2Lo-VR-icE" firstAttribute="top" secondItem="pFT-yy-UiE" secondAttribute="bottom" constant="20" id="AQX-y1-ySX"/>
                             <constraint firstItem="igc-gm-tCN" firstAttribute="top" secondItem="rzb-a5-JJB" secondAttribute="bottom" constant="20" id="AYf-eS-vBC"/>
                             <constraint firstAttribute="trailing" secondItem="pFT-yy-UiE" secondAttribute="trailing" constant="20" id="Cfb-60-1Ae"/>
+                            <constraint firstItem="yWS-65-Odz" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="DoA-94-3Ab"/>
                             <constraint firstItem="rzb-a5-JJB" firstAttribute="top" secondItem="pFT-yy-UiE" secondAttribute="bottom" constant="20" id="LzY-dQ-To4"/>
                             <constraint firstItem="2Lo-VR-icE" firstAttribute="height" secondItem="rzb-a5-JJB" secondAttribute="height" id="P1e-k3-OSK"/>
                             <constraint firstItem="iXH-rJ-QGT" firstAttribute="top" secondItem="cr0-8a-dzT" secondAttribute="bottom" constant="20" id="PP3-d3-Yvm"/>
@@ -87,12 +90,16 @@
                             <constraint firstItem="pFT-yy-UiE" firstAttribute="top" secondItem="iXH-rJ-QGT" secondAttribute="bottom" constant="20" id="Z4F-Vd-5OR"/>
                             <constraint firstItem="pFT-yy-UiE" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="awM-Gw-szI"/>
                             <constraint firstAttribute="trailing" secondItem="iXH-rJ-QGT" secondAttribute="trailing" constant="20" id="fJN-Pq-WkP"/>
+                            <constraint firstAttribute="trailing" secondItem="yWS-65-Odz" secondAttribute="trailing" id="jFF-Q6-hAu"/>
+                            <constraint firstItem="cr0-8a-dzT" firstAttribute="top" secondItem="yWS-65-Odz" secondAttribute="bottom" id="pbP-ka-qiE"/>
                             <constraint firstItem="iXH-rJ-QGT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="qKD-ew-JFg"/>
                             <constraint firstAttribute="trailing" secondItem="cr0-8a-dzT" secondAttribute="trailing" constant="20" id="wL1-Pz-Ur7"/>
+                            <constraint firstItem="yWS-65-Odz" firstAttribute="top" secondItem="Qic-st-hHX" secondAttribute="bottom" id="wTV-Pf-pLV"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="playBtn" destination="rzb-a5-JJB" id="CeE-Av-sqD"/>
+                        <outlet property="player" destination="yWS-65-Odz" id="kyv-D1-esB"/>
                         <outlet property="progress" destination="pFT-yy-UiE" id="Ba5-hF-I5a"/>
                         <outlet property="slider" destination="iXH-rJ-QGT" id="4NW-lU-B0R"/>
                         <outlet property="timeLab" destination="cr0-8a-dzT" id="ga1-iX-5OW"/>

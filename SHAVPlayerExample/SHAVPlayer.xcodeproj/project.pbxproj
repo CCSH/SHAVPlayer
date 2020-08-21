@@ -19,6 +19,9 @@
 		5CC95CB721DDF7B900C948E9 /* SHAVPlayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95CB621DDF7B900C948E9 /* SHAVPlayerTests.m */; };
 		5CC95CC221DDF7B900C948E9 /* SHAVPlayerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95CC121DDF7B900C948E9 /* SHAVPlayerUITests.m */; };
 		5CC95CD221DDF7FB00C948E9 /* SHAVPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC95CD121DDF7FB00C948E9 /* SHAVPlayer.m */; };
+		8387B23B24EF523100C0EF21 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8387B23A24EF523100C0EF21 /* CoreMedia.framework */; };
+		8387B23D24EF523800C0EF21 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8387B23C24EF523800C0EF21 /* MediaPlayer.framework */; };
+		8387B23F24EF523F00C0EF21 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8387B23E24EF523F00C0EF21 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +64,9 @@
 		5CC95CC321DDF7B900C948E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5CC95CD021DDF7FB00C948E9 /* SHAVPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SHAVPlayer.h; sourceTree = "<group>"; };
 		5CC95CD121DDF7FB00C948E9 /* SHAVPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SHAVPlayer.m; sourceTree = "<group>"; };
+		8387B23A24EF523100C0EF21 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		8387B23C24EF523800C0EF21 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		8387B23E24EF523F00C0EF21 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +74,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8387B23D24EF523800C0EF21 /* MediaPlayer.framework in Frameworks */,
+				8387B23B24EF523100C0EF21 /* CoreMedia.framework in Frameworks */,
+				8387B23F24EF523F00C0EF21 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +104,7 @@
 				5CC95CB521DDF7B900C948E9 /* SHAVPlayerTests */,
 				5CC95CC021DDF7B900C948E9 /* SHAVPlayerUITests */,
 				5CC95C9B21DDF7B800C948E9 /* Products */,
+				8387B23924EF523000C0EF21 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -154,6 +164,16 @@
 				5CC95CD121DDF7FB00C948E9 /* SHAVPlayer.m */,
 			);
 			path = SHAVPlayer;
+			sourceTree = "<group>";
+		};
+		8387B23924EF523000C0EF21 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8387B23E24EF523F00C0EF21 /* AVFoundation.framework */,
+				8387B23C24EF523800C0EF21 /* MediaPlayer.framework */,
+				8387B23A24EF523100C0EF21 /* CoreMedia.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

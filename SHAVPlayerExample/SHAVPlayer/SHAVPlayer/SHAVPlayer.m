@@ -12,7 +12,7 @@
 
 #import "SHLoaderURLConnection.h"
 
-@interface SHAVPlayer ()<SHLoaderURLConnectionDelegate>
+@interface SHAVPlayer () < SHLoaderURLConnectionDelegate >
 
 //播放器对象
 @property (nonatomic, strong) AVPlayer *player;
@@ -39,9 +39,11 @@
 @implementation SHAVPlayer
 
 #pragma mark - 懒加载
-- (AVPlayerLayer *)playerLayer{
-    if (!_playerLayer) {
-        _playerLayer = [[AVPlayerLayer alloc]init];
+- (AVPlayerLayer *)playerLayer
+{
+    if (!_playerLayer)
+    {
+        _playerLayer = [[AVPlayerLayer alloc] init];
         _playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
         _playerLayer.frame = self.bounds;
         [self.layer addSublayer:_playerLayer];
@@ -50,47 +52,56 @@
 }
 
 #pragma mark - KVO
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    
-    if ([keyPath isEqualToString:@"status"]) {//播放状态
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"status"])
+    { //播放状态
         
         //获取对象
         AVPlayerItem *playerItem = (AVPlayerItem *)object;
         AVPlayerStatus status = [change[NSKeyValueChangeNewKey] intValue];
         
-        switch (status) {
-            case AVPlayerStatusReadyToPlay://准备播放
+        switch (status)
+        {
+            case AVPlayerStatusReadyToPlay: //准备播放
             {
                 //获取资源总时长
                 CMTime duration = playerItem.asset.duration;
                 //转换成秒
                 NSInteger totalTime = CMTimeGetSeconds(duration);
                 
-                if (totalTime > 0) {
-                    
+                if (totalTime > 0)
+                {
                     self.totalTime = totalTime;
-                    
-                    //回调
-                    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-                        
-                        [self.delegate shAVPlayStatusChange:SHAVPlayStatus_readyToPlay
-                                                    message:[NSString stringWithFormat:@"%ld",(long)totalTime]];
-                    }
+                }
+                else
+                {
+                    //直播
+                    _isLive = YES;
+                    self.totalTime = 0;
+                }
+                
+                //回调
+                if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+                {
+                    [self.delegate shAVPlayStatusChange:SHAVPlayStatus_readyToPlay
+                                                message:[NSString stringWithFormat:@"%ld", self.totalTime]];
                 }
                 //监听播放进度
                 [self addPlayProgress];
                 //自动播放
-                if (self.isAutomatic) {
+                if (self.isAutomatic)
+                {
                     [self play];
                 }
             }
                 break;
-            case AVPlayerItemStatusFailed://播放错误
-            case AVPlayerItemStatusUnknown://未知错误
+            case AVPlayerItemStatusFailed:  //播放错误
+            case AVPlayerItemStatusUnknown: //未知错误
             {
                 //回调
-                if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-                    
+                if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+                {
                     [self.delegate shAVPlayStatusChange:SHAVPlayStatus_failure
                                                 message:[self.playerItem.error description]];
                 }
@@ -99,8 +110,9 @@
             default:
                 break;
         }
-        
-    } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {//缓存进度
+    }
+    else if ([keyPath isEqualToString:@"loadedTimeRanges"])
+    { //缓存进度
         
         //获取对象
         AVPlayerItem *playerItem = (AVPlayerItem *)object;
@@ -110,43 +122,53 @@
         NSInteger statrtTime = CMTimeGetSeconds(timeRange.start);
         NSInteger durationTime = CMTimeGetSeconds(timeRange.duration);
         //获取缓存时间
-        NSInteger cacheTime =  statrtTime + durationTime;
+        NSInteger cacheTime = statrtTime + durationTime;
         
         //回调
-        if ([self.delegate respondsToSelector:@selector(shAVPlayWithCacheTime:)]) {
-            
+        if ([self.delegate respondsToSelector:@selector(shAVPlayWithCacheTime:)])
+        {
             [self.delegate shAVPlayWithCacheTime:cacheTime];
         }
-    }else if ([keyPath isEqualToString:@"frame"]){//视图frame
+    }
+    else if ([keyPath isEqualToString:@"frame"])
+    { //视图frame
         
         self.playerLayer.frame = self.bounds;
-    }else if ([keyPath isEqualToString:@"rate"]){//播放器状态
+    }
+    else if ([keyPath isEqualToString:@"rate"])
+    { //播放器状态
         
         //回调
-        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-            
-            if (self.player.rate > 0 && !self.player.error) {
+        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+        {
+            if (self.player.rate > 0 && !self.player.error)
+            {
                 [self.delegate shAVPlayStatusChange:SHAVPlayStatus_play
                                             message:@"播放"];
-            }else{
+            }
+            else
+            {
                 [self.delegate shAVPlayStatusChange:SHAVPlayStatus_pause
                                             message:@"暂停"];
             }
         }
-        
-    }else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//缓存不可用
+    }
+    else if ([keyPath isEqualToString:@"playbackBufferEmpty"])
+    { //缓存不可用
         
         //回调
-        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-            
+        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+        {
             [self.delegate shAVPlayStatusChange:SHAVPlayStatus_loading
                                         message:@"缓存不可用"];
         }
-    }else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){//缓存可以用
+    }
+    else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"])
+    { //缓存可以用
         
         //回调
-        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-            
+        if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+        {
             [self.delegate shAVPlayStatusChange:SHAVPlayStatus_canPlay
                                         message:@"缓存可以用"];
         }
@@ -154,22 +176,25 @@
 }
 
 #pragma mark 监听播放进度
-- (void)addPlayProgress{
-    
+- (void)addPlayProgress
+{
     __weak typeof(self) weakSelf = self;
     //监听当前播放进度
-    self.timeObserver = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
-        
+    self.timeObserver = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1)
+                                                                  queue:NULL
+                                                             usingBlock:^(CMTime time) {
         //计算当前在第几秒
         NSInteger currentTime = CMTimeGetSeconds(time);
         
         //避免重复调用
-        if (currentTime == weakSelf.currentTime) {
-            return ;
+        if (currentTime == weakSelf.currentTime)
+        {
+            return;
         }
         weakSelf.currentTime = currentTime;
         
-        if (weakSelf.isBackPlay) {//后台播放
+        if (weakSelf.isBackPlay)
+        { //后台播放
             
             // 设置歌曲的总时长
             [weakSelf.lockInfo setObject:@(weakSelf.totalTime)
@@ -183,53 +208,56 @@
         }
         
         //回调
-        if ([weakSelf.delegate respondsToSelector:@selector(shAVPlayWithCurrentTime:)]) {
-            
+        if ([weakSelf.delegate respondsToSelector:@selector(shAVPlayWithCurrentTime:)])
+        {
             [weakSelf.delegate shAVPlayWithCurrentTime:currentTime];
         }
     }];
 }
 
 #pragma mark 播放完成
-- (void)playFinished {
-    
+- (void)playFinished
+{
     //回调
-    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-        
+    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+    {
         [self.delegate shAVPlayStatusChange:SHAVPlayStatus_end
                                     message:@"播放完成"];
     }
 }
 
 #pragma mark 中断处理
-- (void)handleInterreption{
-    
+- (void)handleInterreption
+{
     [self pause];
 }
 
 #pragma mark 进入后台
-- (void)enterBackground{
-    
-    if (self.isBackPlay) {
+- (void)enterBackground
+{
+    if (self.isBackPlay)
+    {
         self.playerLayer.player = nil;
-    }else{
+    }
+    else
+    {
         [self pause];
     }
 }
 
 #pragma mark 进入前台
-- (void)enterForeground{
-    
-    if (self.isBackPlay && !self.playerLayer.player) {
-        
+- (void)enterForeground
+{
+    if (self.isBackPlay && !self.playerLayer.player)
+    {
         self.playerLayer.player = self.player;
     }
 }
 
 #pragma mark - 其他方法
 #pragma mark 配置信息
-- (void)configInfo{
-    
+- (void)configInfo
+{
     self.hasKVO = YES;
     
     //监听frame
@@ -292,7 +320,8 @@
                                      withOptions:AVAudioSessionCategoryOptionAllowBluetooth
                                            error:nil];
     
-    if (self.isBackPlay) {//支持后台播放
+    if (self.isBackPlay)
+    { //支持后台播放
         
         //设置锁屏信息
         [self configLockInfo];
@@ -300,9 +329,10 @@
 }
 
 #pragma mark 清除信息
-- (void)clearInfo{
-    
-    if (self.hasKVO) {//避免多次移除报错
+- (void)clearInfo
+{
+    if (self.hasKVO)
+    { //避免多次移除报错
         
         self.hasKVO = NO;
         
@@ -310,13 +340,14 @@
         //取消请求
         [self.resouerLoader.task cancelTask];
         
-        if (self.timeObserver) {
+        if (self.timeObserver)
+        {
             [self.player removeTimeObserver:self.timeObserver];
             self.timeObserver = nil;
         }
         
-        if (self.playerItem) {
-            
+        if (self.playerItem)
+        {
             [self.playerItem removeObserver:self
                                  forKeyPath:@"status"];
             [self.playerItem removeObserver:self
@@ -350,24 +381,28 @@
 }
 
 #pragma mark 设置锁屏信息
-- (void)configLockInfo{
-    
+- (void)configLockInfo
+{
     //锁屏信息
     self.lockInfo = [NSMutableDictionary dictionary];
     // 1、设置标题
-    if (self.title) {
+    if (self.title)
+    {
         [self.lockInfo setObject:self.title forKey:MPMediaItemPropertyTitle];
     }
     // 2、设置歌曲名
-    if (self.name) {
+    if (self.name)
+    {
         [self.lockInfo setObject:self.name forKey:MPMediaItemPropertyAlbumTitle];
     }
     // 3、设置艺术家
-    if (self.artist) {
+    if (self.artist)
+    {
         [self.lockInfo setObject:self.artist forKey:MPMediaItemPropertyArtist];
     }
     // 4、设置封面的图片
-    if (self.coverImage) {
+    if (self.coverImage)
+    {
         MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithImage:self.coverImage];
         [self.lockInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
     }
@@ -378,33 +413,35 @@
     MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
     
     //界面控制
-    [rcc.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+    [rcc.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
         [self play];
         return MPRemoteCommandHandlerStatusSuccess;
     }];
     
-    [rcc.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+    [rcc.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
         [self pause];
         return MPRemoteCommandHandlerStatusSuccess;
     }];
     
     //播放与暂停(耳机线控)
     [rcc.togglePlayPauseCommand setEnabled:YES];
-    [rcc.togglePlayPauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-        if (self.player.rate) {
+    [rcc.togglePlayPauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
+        if (self.player.rate)
+        {
             [self pause];
-        }else{
+        }
+        else
+        {
             [self play];
         }
         return MPRemoteCommandHandlerStatusSuccess;
     }];
     
     //拖拽进度
-    if (@available(iOS 9.1, *)) {
-        
+    if (@available(iOS 9.1, *))
+    {
         [rcc.changePlaybackPositionCommand setEnabled:YES];
-        [rcc.changePlaybackPositionCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            
+        [rcc.changePlaybackPositionCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
             //跳转时间
             MPChangePlaybackPositionCommandEvent *playEvent = (MPChangePlaybackPositionCommandEvent *)event;
             //进行跳转
@@ -412,57 +449,64 @@
             
             return MPRemoteCommandHandlerStatusSuccess;
         }];
-    } else {
+    }
+    else
+    {
         // Fallback on earlier versions
     }
     
     //上一首
     [rcc.previousTrackCommand setEnabled:YES];
-    [rcc.previousTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-        
+    [rcc.previousTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
         return MPRemoteCommandHandlerStatusSuccess;
     }];
     
     //下一首
     [rcc.nextTrackCommand setEnabled:YES];
-    [rcc.nextTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-        
+    [rcc.nextTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
         return MPRemoteCommandHandlerStatusSuccess;
     }];
 }
 
 #pragma mark - 公共方法
 #pragma mark 准备播放
-- (void)preparePlay{
-    
+- (void)preparePlay
+{
     //清除信息
     [self clearInfo];
     
     //初始化
     AVURLAsset *asset;
-    if (self.isDownLoad) {//是否开启边下边播
+    if (self.isDownLoad)
+    { //是否开启边下边播
         
         self.resouerLoader = [[SHLoaderURLConnection alloc] init];
         self.resouerLoader.delegate = self;
         
         asset = [AVURLAsset URLAssetWithURL:[SHLoaderURLConnection getSchemeVideoURL:self.url] options:nil];
         [asset.resourceLoader setDelegate:self.resouerLoader queue:dispatch_get_main_queue()];
-    }else{//在线播放
+    }
+    else
+    { //在线播放
         
         asset = [AVURLAsset URLAssetWithURL:self.url options:nil];
     }
     
     self.playerItem = [AVPlayerItem playerItemWithAsset:asset];
     
-    if (!self.player) {
+    if (!self.player)
+    {
         self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
-    } else {
+    }
+    else
+    {
         [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
     }
     
     self.playerLayer.player = self.player;
     
-    if (!self.url.absoluteString.length) {
+    if (!self.url.absoluteString.length)
+    {
         return;
     }
     
@@ -471,23 +515,28 @@
 }
 
 #pragma mark 开始播放
-- (void)play{
+- (void)play
+{
     //如果在停止播放状态就播放
-    if (self.player.rate == 0) {
+    if (self.player.rate == 0)
+    {
         [self.player play];
     }
 }
 
 #pragma mark 暂停播放
-- (void)pause{
+- (void)pause
+{
     //如果在播放状态就停止
-    if (self.player.rate == 1) {
+    if (self.player.rate == 1)
+    {
         [self.player pause];
     }
 }
 
 #pragma mark 停止播放
-- (void)stop{
+- (void)stop
+{
     //暂停
     [self pause];
     //到0
@@ -495,10 +544,10 @@
 }
 
 #pragma mark 跳转多少秒
-- (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL))block{
-    
+- (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL))block
+{
     //向下取整
-    time =  (int)time;
+    time = (int)time;
     
     time = MAX(0, time);
     time = MIN(time, self.totalTime);
@@ -509,9 +558,10 @@
 }
 
 #pragma mark 处理时间
-+ (NSString *)dealTime:(NSTimeInterval)time{
-    
-    if (isnan(time)) {
++ (NSString *)dealTime:(NSTimeInterval)time
+{
+    if (isnan(time))
+    {
         return @"00:00";
     }
     
@@ -519,16 +569,20 @@
     formatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
     formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
     
-    if (time/3600 >= 1) {
+    if (time / 3600 >= 1)
+    {
         formatter.allowedUnits = kCFCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
-    } else {
+    }
+    else
+    {
         formatter.allowedUnits = NSCalendarUnitMinute | NSCalendarUnitSecond;
     }
     
     NSString *dealTime = [formatter stringFromTimeInterval:time];
     
-    if (dealTime.length == 7  || dealTime.length == 4) {
-        dealTime = [NSString stringWithFormat:@"0%@",dealTime];
+    if (dealTime.length == 7 || dealTime.length == 4)
+    {
+        dealTime = [NSString stringWithFormat:@"0%@", dealTime];
     }
     
     return dealTime;
@@ -536,20 +590,21 @@
 
 #pragma mark - 边下边播 -
 #pragma mark - SHLoaderURLConnectionDelegate
-- (void)shLoaderDidFinishLoadingWithPath:(NSString *)path{
-    
+- (void)shLoaderDidFinishLoadingWithPath:(NSString *)path
+{
     //回调
-    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
-        
+    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+    {
         [self.delegate shAVPlayStatusChange:SHAVPlayStatus_downEnd message:path];
     }
 }
 
 #pragma mark 错误信息
-- (void)shLoaderDidFailLoadingWithErrorCode:(NSInteger)errorCode{
-    
+- (void)shLoaderDidFailLoadingWithErrorCode:(NSInteger)errorCode
+{
     NSString *str = @"";
-    switch (errorCode) {
+    switch (errorCode)
+    {
         case -1001:
             str = @"请求超时";
             break;
@@ -569,7 +624,8 @@
     }
     
     //回调
-    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)]) {
+    if ([self.delegate respondsToSelector:@selector(shAVPlayStatusChange:message:)])
+    {
         [self.delegate shAVPlayStatusChange:SHAVPlayStatus_failure message:str];
     }
 }
