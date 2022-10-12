@@ -55,6 +55,10 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign, readonly) BOOL isLive;
 //总时长(如果能获取到 内部有设置)
 @property (nonatomic, assign) NSInteger totalTime;
+//播放速率
+@property (nonatomic, assign) CGFloat rate;
+//是否正在播放
+@property (nonatomic, assign, readonly) BOOL isPlaying;
 
 
 //锁屏音频信息(可以不设置)
@@ -77,7 +81,7 @@ typedef enum : NSUInteger {
 - (void)stop;
 
 //跳转多少秒
-- (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL finish))block;
+- (void)seekToTime:(NSTimeInterval)time block:(nullable void (^)(BOOL finish))block;
 
 //清除信息
 - (void)clearInfo;
