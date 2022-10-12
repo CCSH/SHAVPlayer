@@ -51,6 +51,15 @@
     return _playerLayer;
 }
 
+- (void)setRate:(CGFloat)rate{
+    _rate = rate;
+    self.player.rate = rate;
+}
+
+- (BOOL)isPlaying{
+    return self.player.rate != 0 && !self.player.error;
+}
+
 #pragma mark - KVO
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -426,7 +435,7 @@
     //播放与暂停(耳机线控)
     [rcc.togglePlayPauseCommand setEnabled:YES];
     [rcc.togglePlayPauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent *_Nonnull event) {
-        if (self.player.rate)
+        if (self.player.rate != 0)
         {
             [self pause];
         }
@@ -521,6 +530,9 @@
     if (self.player.rate == 0)
     {
         [self.player play];
+        if(self.rate > 0){
+            self.player.rate = self.rate;
+        }
     }
 }
 
@@ -528,7 +540,7 @@
 - (void)pause
 {
     //如果在播放状态就停止
-    if (self.player.rate == 1)
+    if (self.player.rate != 0)
     {
         [self.player pause];
     }
@@ -544,7 +556,7 @@
 }
 
 #pragma mark 跳转多少秒
-- (void)seekToTime:(NSTimeInterval)time block:(void (^)(BOOL))block
+- (void)seekToTime:(NSTimeInterval)time block:(nullable void (^)(BOOL))block
 {
     //向下取整
     time = (int)time;
@@ -588,8 +600,8 @@
     return dealTime;
 }
 
-#pragma mark - 边下边播 -
-#pragma mark - SHLoaderURLConnectionDelegate
+#pragma mark - 边下边播
+#pragma mark SHLoaderURLConnectionDelegate
 - (void)shLoaderDidFinishLoadingWithPath:(NSString *)path
 {
     //回调
